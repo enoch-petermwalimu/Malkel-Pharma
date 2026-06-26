@@ -44,6 +44,8 @@ class DashboardController extends Controller
 
         $salesToday = count($salesRepo->todaySales());
 
+        $dailySales = $salesRepo->dailySalesLast7Days();
+
         $this->view('dashboard.index', [
             /*
              * Revenue
@@ -77,7 +79,12 @@ class DashboardController extends Controller
              */
             'customersCount' => $customersCount,
             'productsCount' => $productsCount,
-            'usersCount' => $usersCount
+            'usersCount' => $usersCount,
+
+            /*
+             * Chart Data
+             */
+            'dailySales' => $dailySales
         ]);
     }
 }

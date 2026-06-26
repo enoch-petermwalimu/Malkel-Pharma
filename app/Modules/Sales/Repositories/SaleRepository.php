@@ -466,4 +466,25 @@ public function revenueDays(int $days): float
             PDO::FETCH_ASSOC
         );
     }
+
+    /**
+     * Get daily sales for the last 7 days
+     */
+    public function dailySalesLast7Days(): array
+    {
+        $statement = $this->db->query(
+            "
+            SELECT
+                DATE(created_at) as date,
+                SUM(total) as revenue,
+                COUNT(*) as count
+            FROM sales
+            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            GROUP BY DATE(created_at)
+            ORDER BY DATE(created_at) ASC
+            "
+        );
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

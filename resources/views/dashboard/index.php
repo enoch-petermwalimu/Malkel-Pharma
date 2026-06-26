@@ -313,35 +313,40 @@
 const ctx =
 document.getElementById('salesChart');
 
+const dailySales = <?= json_encode($dailySales ?? []) ?>;
+
+// Build labels and data arrays from daily sales
+const labels = [];
+const data = [];
+
+// Generate last 7 days
+for (let i = 6; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const dateStr = date.toISOString().split('T')[0];
+    
+    // Format label as day name
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    labels.push(dayNames[date.getDay()]);
+    
+    // Find matching daily sale
+    const sale = dailySales.find(s => s.date === dateStr);
+    data.push(sale ? parseFloat(sale.revenue) : 0);
+}
+
 new Chart(ctx, {
 
     type:'line',
 
     data:{
 
-        labels:[
-            'Mon',
-            'Tue',
-            'Wed',
-            'Thu',
-            'Fri',
-            'Sat',
-            'Sun'
-        ],
+        labels: labels,
 
         datasets:[{
 
-            label:'Sales',
+            label:'Sales ($)',
 
-            data:[
-                12,
-                19,
-                8,
-                15,
-                22,
-                17,
-                30
-            ],
+            data: data,
 
             borderColor:'#3b82f6',
 
