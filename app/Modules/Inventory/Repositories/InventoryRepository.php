@@ -52,12 +52,12 @@ class InventoryRepository extends BaseRepository
             SELECT
                 p.name,
                 SUM(b.quantity) as total_stock,
-                p.minimum_stock
+                COALESCE(p.minimum_stock_level, p.minimum_stock, 0) as minimum_stock
             FROM inventory_batches b
             JOIN products p
                 ON p.id = b.product_id
             GROUP BY p.id
-            HAVING total_stock <= p.minimum_stock
+            HAVING total_stock <= minimum_stock
             "
         );
 

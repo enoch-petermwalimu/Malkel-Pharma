@@ -10,7 +10,7 @@
 
         <form
             method="POST"
-            action="/inventory/batches"
+            action="/inventory/store-batch"
         >
 
             <div class="mb-4">

@@ -146,10 +146,7 @@ public function saleItems(
         "
         SELECT
             si.*,
-            p.name as product_name,
-            p.allow_customer_restock,
-            p.is_temperature_sensitive,
-            p.is_prescription_only
+            p.name as product_name
         FROM sale_items si
         JOIN products p
             ON p.id = si.product_id

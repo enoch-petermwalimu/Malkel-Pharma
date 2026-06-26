@@ -92,20 +92,6 @@
             </div>
 
         </div>
-<div
-    id="cartItems"
-    class="cart-items"
->
-
-    <div class="empty-state">
-
-        No products selected
-
-    </div>
-
-</div>
-
-</div>
 
 <!-- =============================================
      PAYMENT
