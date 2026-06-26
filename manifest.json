@@ -1,0 +1,10 @@
+{
+    "name": "MALKEL PHARMA",
+    "version": "1.0.0",
+    "codename": "LUBUMBASHI",
+    "build": "20260622",
+    "status": "stable",
+    "author": "MALKEL PHARMA",
+    "minimum_php": "8.1",
+    "minimum_mariadb": "10.5"
+}
