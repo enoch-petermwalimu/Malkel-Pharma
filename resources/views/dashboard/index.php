@@ -92,12 +92,12 @@
             <?= number_format($revenue30Days ?? 0, 2) ?>
         </h2>
 
-            <a href="/sales/history?period=today"
-        class="metric-link">
+        </div>
+
+        <a href="/sales/history?period=today"
+            class="metric-link">
             View Sales →
         </a>
-
-        </div>
 
 </div>
 

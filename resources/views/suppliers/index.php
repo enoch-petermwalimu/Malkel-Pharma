@@ -556,12 +556,12 @@ if(supplierFilter)
 
             document
             .querySelectorAll(
-                '.supplier-card'
+                '.card'
             )
             .forEach(card =>
             {
                 const name =
-                    card.dataset.name;
+                    card.innerText.toLowerCase();
 
                 card.style.display =
                     name.includes(search)
