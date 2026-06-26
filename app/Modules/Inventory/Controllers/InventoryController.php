@@ -136,31 +136,50 @@ class InventoryController extends Controller
 
             $data = $request->body();
 
-            $batch =
+            $batchId = (int) ($data['id'] ?? 0);
+
+            if ($batchId <= 0) {
+                $this->redirect('/inventory');
+                return;
+            }
+
+            $batchModel =
                 new \App\Modules\Inventory\Models\InventoryBatch();
 
-            $batch->update(
-                (int) $data['id'],
+            // Check if batch exists
+            $existing = $batchModel->find($batchId);
+
+            if (!$existing) {
+                $this->redirect('/inventory');
+                return;
+            }
+
+            $updated = $batchModel->update(
+                $batchId,
                 [
                     'batch_number' =>
-                        $data['batch_number'],
+                        $data['batch_number'] ?? $existing['batch_number'],
 
                     'expiry_date' =>
-                        $data['expiry_date'],
+                        $data['expiry_date'] ?? $existing['expiry_date'],
 
                     'quantity' =>
-                        $data['quantity'],
+                        $data['quantity'] ?? $existing['quantity'],
 
                     'supplier' =>
-                        $data['supplier'],
+                        $data['supplier'] ?? $existing['supplier'],
 
                     'purchase_price' =>
-                        $data['purchase_price'],
+                        $data['purchase_price'] ?? $existing['purchase_price'],
 
                     'selling_price' =>
-                        $data['selling_price']
+                        $data['selling_price'] ?? $existing['selling_price']
                 ]
             );
+
+            if (!$updated) {
+                // Log error or handle failure
+            }
 
             $this->redirect('/inventory');
         }
