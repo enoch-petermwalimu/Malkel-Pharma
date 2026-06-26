@@ -272,7 +272,9 @@
                     <td>
 
                         <?= htmlspecialchars(
-                            $item['name']
+                            $item['product_name']
+                            ?? $item['name']
+                            ?? '-'
                         ) ?>
 
                     </td>

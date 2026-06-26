@@ -78,7 +78,7 @@ async function lookupInvoice()
 
     const response =
         await fetch(
-            `/sales/invoice-lookup?invoice=${invoice}`
+            `/pos/invoice-lookup?invoice=${invoice}`
         );
 
     const data =
@@ -223,26 +223,10 @@ function renderItems(items)
 
             <td>
 
-                ${
-                    item.allow_customer_restock &&
-                    !item.is_temperature_sensitive &&
-                    !item.is_prescription_only
-
-                    ?
-
-                    `<input
-                        type="checkbox"
-                        id="restock_${item.id}"
-                    >`
-
-                    :
-
-                    `<span style="
-                        color:#ef4444;
-                    ">
-                        Forbidden
-                    </span>`
-                }
+                <input
+                    type="checkbox"
+                    id="restock_${item.id}"
+                >
 
             </td>
 
