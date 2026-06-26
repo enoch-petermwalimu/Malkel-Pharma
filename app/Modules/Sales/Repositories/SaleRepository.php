@@ -216,28 +216,6 @@ public function saleItems(
     }
 
 
-public function saleDetails(
-    int $saleId
-): array {
-
-    $statement = $this->db->prepare(
-        "
-        SELECT
-            si.*,
-            p.name
-        FROM sale_items si
-        JOIN products p
-            ON p.id = si.product_id
-        WHERE si.sale_id = :sale_id
-        "
-    );
-
-    $statement->execute([
-        'sale_id' => $saleId
-    ]);
-
-    return $statement->fetchAll(PDO::FETCH_ASSOC);
-}
 
 
     public function revenueLast3Days(): float

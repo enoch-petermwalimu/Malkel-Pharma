@@ -142,18 +142,19 @@ class ReturnService
         $soldMap[$sold['product_id']] = $sold;
     }
 
-    $this->returnModel->create([
-        'return_type' => 'customer_return',
-        'reference_type' => 'sale',
-        'reference_id' => $data['sale_id'],
+    // Reuse the create method for the return record
+    $result = $this->create([
+        'sale_id' => $data['sale_id'],
         'customer_id' => $data['customer_id'],
-        'total_amount' => $data['total_amount'],
-        'refund_type' => $data['refund_type'],
-        'reason' => $data['reason']
+        'reason' => $data['reason'],
+        'items' => []
     ]);
 
-    $returnId =
-        (int) $this->returnModel->lastInsertId();
+    if (!$result) {
+        return false;
+    }
+
+    $returnId = $result['return_id'];
 
     foreach ($data['items'] as $item) {
 
