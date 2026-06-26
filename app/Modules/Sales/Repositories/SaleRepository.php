@@ -21,7 +21,10 @@ class SaleRepository extends BaseRepository
      */
     public function generateInvoiceNumber(): string
     {
-        return 'INV-'
+        $settingsService = new \App\Modules\Settings\Services\SettingsService();
+        $prefix = $settingsService->invoicePrefix();
+
+        return $prefix
             . date('Ymd')
             . '-'
             . rand(1000, 9999);

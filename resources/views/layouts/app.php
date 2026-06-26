@@ -1,34 +1,17 @@
 <?php
 
-use App\Core\Database;
+use App\Modules\Settings\Services\SettingsService;
 
 /* =====================================================
    SETTINGS
 ===================================================== */
 
+$settingsService = new SettingsService();
 $settings = [];
 
 try {
-
-    $db = Database::connect();
-
-    $stmt = $db->query(
-        "SELECT setting_key, setting_value
-         FROM settings"
-    );
-
-    foreach (
-        $stmt->fetchAll()
-        as $row
-    ) {
-
-        $settings[
-            $row['setting_key']
-        ] = $row['setting_value'];
-    }
-
+    $settings = $settingsService->all();
 } catch (\Throwable $e) {
-
     $settings = [];
 }
 
@@ -85,11 +68,8 @@ $pageTitle
    LOGO
 ===================================================== */
 
-$logo =
-'/assets/images/logo.png';
-
-$logoIcon =
-'/assets/images/logo-icon.svg';
+$logo = $settings['pharmacy_logo'] ?? '/assets/images/logo.png';
+$logoIcon = '/assets/images/logo-icon.svg';
 ?>
 
 <!DOCTYPE html>

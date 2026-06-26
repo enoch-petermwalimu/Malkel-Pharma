@@ -36,3 +36,31 @@ if (!function_exists('dd')) {
         exit;
     }
 }
+
+if (!function_exists('settings')) {
+    /**
+     * Get the SettingsService instance
+     */
+    function settings(): \App\Modules\Settings\Services\SettingsService
+    {
+        static $instance = null;
+        if ($instance === null) {
+            $instance = new \App\Modules\Settings\Services\SettingsService();
+        }
+        return $instance;
+    }
+}
+
+if (!function_exists('settings')) {
+    /**
+     * Get the SettingsService instance
+     */
+    function settings(): \App\Modules\Settings\Services\SettingsService
+    {
+        static $instance = null;
+        if ($instance === null) {
+            $instance = new \App\Modules\Settings\Services\SettingsService();
+        }
+        return $instance;
+    }
+}

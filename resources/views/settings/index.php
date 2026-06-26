@@ -151,6 +151,78 @@
 
         </div>
 
+        <!-- Facturation -->
+
+        <div class="card mt-6">
+
+            <div class="section-title">
+                Facturation
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div class="mb-4">
+
+                    <label>
+                        Préfixe de facture
+                    </label>
+
+                    <input
+                        type="text"
+                        name="invoice_prefix"
+                        value="<?= htmlspecialchars($settings['invoice_prefix'] ?? 'INV-') ?>"
+                    >
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label>
+                        Taux de taxe (%)
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="tax_rate"
+                        value="<?= htmlspecialchars($settings['tax_rate'] ?? '0') ?>"
+                    >
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label>
+                        TVA (%)
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.01"
+                        name="vat_rate"
+                        value="<?= htmlspecialchars($settings['vat_rate'] ?? '0') ?>"
+                    >
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label>
+                        Pied de reçu
+                    </label>
+
+                    <input
+                        type="text"
+                        name="receipt_footer"
+                        value="<?= htmlspecialchars($settings['receipt_footer'] ?? 'Thank you for your purchase!') ?>"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
         <!-- Apparence -->
 
         <div class="card mt-6">
