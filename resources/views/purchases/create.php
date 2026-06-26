@@ -423,10 +423,10 @@ document.getElementById('purchaseForm').addEventListener('submit', async functio
         const data = await response.json();
 
         if (data.success) {
-            alert('Achat créé avec succès');
+            alert('Achat créé avec succès. N°: ' + data.purchase_number);
             window.location.href = '/purchases';
         } else {
-            alert('Erreur lors de la création de l\'achat');
+            alert('Erreur lors de la création de l\'achat: ' + (data.message || 'Erreur inconnue'));
         }
     } catch (error) {
         alert('Erreur réseau');

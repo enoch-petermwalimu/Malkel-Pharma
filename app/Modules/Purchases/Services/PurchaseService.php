@@ -34,11 +34,13 @@ class PurchaseService
      */
     public function create(
         array $data
-    ): bool {
+    ): array|false {
 
         try {
 
             $this->db->beginTransaction();
+
+            $purchaseNumber = $this->repository->generatePurchaseNumber();
 
             /**
              * Purchase
@@ -46,9 +48,7 @@ class PurchaseService
             $created =
                 $this->repository
                     ->createPurchase([
-                        'purchase_number' =>
-                            $this->repository
-                                ->generatePurchaseNumber(),
+                        'purchase_number' => $purchaseNumber,
 
                         'supplier_id' =>
                             $data['supplier_id'],
@@ -174,7 +174,10 @@ class PurchaseService
 
             $this->db->commit();
 
-            return true;
+            return [
+                'purchase_id' => $purchaseId,
+                'purchase_number' => $purchaseNumber
+            ];
 
         } catch (Exception $e) {
 

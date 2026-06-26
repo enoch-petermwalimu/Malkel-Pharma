@@ -48,11 +48,20 @@ class PurchaseController extends Controller
 
         $data = $request->body();
 
-        $success =
-            $this->service->create($data);
+        $result = $this->service->create($data);
+
+        if (!$result) {
+            $this->json([
+                'success' => false,
+                'message' => 'Purchase creation failed'
+            ], 500);
+            return;
+        }
 
         $this->json([
-            'success' => $success
+            'success' => true,
+            'purchase_id' => $result['purchase_id'],
+            'purchase_number' => $result['purchase_number']
         ]);
     }
 
