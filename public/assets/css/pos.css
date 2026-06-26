@@ -1,0 +1,286 @@
+/**
+ * =============================================================
+ * MARKEL PHARMA POS UI
+ * =============================================================
+ * Modern POS Interface
+ * Supports:
+ * - dark/light mode
+ * - animations
+ * - responsive
+ * =============================================================
+ */
+
+:root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --primary: #2563eb;
+    --success: #10b981;
+    --border: #e5e7eb;
+    --shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+body[data-theme="dark"] {
+    --bg: #111827;
+    --card: #1f2937;
+    --text: #f9fafb;
+    --muted: #9ca3af;
+    --primary: #3b82f6;
+    --success: #10b981;
+    --border: #374151;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: all .3s ease;
+}
+
+/* Layout */
+.pos-shell {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    height: 100vh;
+}
+
+/* Left */
+.pos-left {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+/* Right cart */
+.pos-right {
+    background: var(--card);
+    border-left: 1px solid var(--border);
+    padding: 24px;
+    box-shadow: var(--shadow);
+}
+
+/* Header */
+.pos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.theme-btn {
+    border: none;
+    background: var(--primary);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform .2s ease;
+}
+
+.theme-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Search */
+.search-box {
+    background: var(--card);
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    font-size: 16px;
+}
+
+/* Results */
+#searchResults {
+    margin-top: 12px;
+}
+
+.search-item {
+    padding: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .2s ease;
+    animation: fadeIn .25s ease;
+}
+
+.search-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+/* Cart */
+.cart-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+}
+
+#cartItems {
+    min-height: 200px;
+}
+
+.cart-item {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    animation: slideIn .25s ease;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    background: var(--success);
+    color: white;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    transition: transform .2s ease;
+}
+
+.checkout-btn:hover {
+    transform: scale(1.03);
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--primary);
+    color: white;
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    animation: fadeIn .25s ease;
+    z-index: 9999;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive */
+@media(max-width: 900px) {
+    .pos-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .pos-right {
+        border-left: none;
+        border-top: 1px solid var(--border);
+    }
+}
+
+/* ============================================================
+   Totals
+============================================================ */
+
+.totals-box {
+    margin-top: 20px;
+    background: var(--bg);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.total-final {
+    font-size: 20px;
+    font-weight: bold;
+    border-bottom: none;
+}
+
+/* ============================================================
+   Quantity controls
+============================================================ */
+
+.qty-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.qty-btn {
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--primary);
+    color: white;
+}
+
+.remove-btn {
+    border: none;
+    background: crimson;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#paymentMethod {
+    width: 100%;
+    padding: 14px;
+    margin-top: 20px;
+    border-radius: 12px;
+}
+
+#customerResults {
+    margin: 10px 0;
+}
+
+.customer-item {
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    background: var(--card);
+}
+
+.customer-item:hover {
+    transform: translateY(-2px);
+}
+
+#selectedCustomer {
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    background: rgba(16,185,129,0.15);
+}

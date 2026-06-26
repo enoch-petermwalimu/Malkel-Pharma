@@ -1,0 +1,120 @@
+/**
+ * ============================================================
+ * MARKEL PHARMA DASHBOARD UI
+ * ============================================================
+ */
+
+:root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --text: #111827;
+    --muted: #6b7280;
+    --primary: #2563eb;
+    --danger: #dc2626;
+    --warning: #d97706;
+    --success: #059669;
+    --border: #e5e7eb;
+    --shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+body[data-theme="dark"] {
+    --bg: #111827;
+    --card: #1f2937;
+    --text: #f9fafb;
+    --muted: #9ca3af;
+    --border: #374151;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: .3s ease;
+}
+
+.dashboard-shell {
+    padding: 24px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.kpi-card {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    animation: fadeIn .35s ease;
+}
+
+.kpi-title {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.kpi-value {
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.section-card {
+    margin-top: 24px;
+    background: var(--card);
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+}
+
+.alert-item {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.theme-btn {
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+}
+
+canvas {
+    width: 100%;
+    max-width: 100%;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media(max-width: 1000px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 700px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
