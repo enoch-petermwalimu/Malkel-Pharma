@@ -149,6 +149,19 @@ if ($_SERVER['REQUEST_URI'] === '/pos/invoice-lookup' && $_SERVER['REQUEST_METHO
     exit;
 }
 
+// Sales routes
+// Route: GET /sales/history
+if ($_SERVER['REQUEST_URI'] === '/sales/history' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $saleController->index();
+    exit;
+}
+
+// Route: GET /sales/show
+if (str_starts_with($_SERVER['REQUEST_URI'], '/sales/show') && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $saleController->show();
+    exit;
+}
+
 // Purchase routes
 $purchaseController = new PurchaseController();
 
