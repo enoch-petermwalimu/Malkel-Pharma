@@ -258,6 +258,12 @@ if ($_SERVER['REQUEST_URI'] === '/returns/create' && $_SERVER['REQUEST_METHOD'] 
     exit;
 }
 
+// Route: GET /returns/supplier
+if ($_SERVER['REQUEST_URI'] === '/returns/supplier' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $returnController->supplierView();
+    exit;
+}
+
 // Route: POST /returns/store
 if ($_SERVER['REQUEST_URI'] === '/returns/store' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $returnController->store();
@@ -267,6 +273,12 @@ if ($_SERVER['REQUEST_URI'] === '/returns/store' && $_SERVER['REQUEST_METHOD'] =
 // Route: POST /returns/customer
 if ($_SERVER['REQUEST_URI'] === '/returns/customer' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $returnController->customer();
+    exit;
+}
+
+// Route: POST /returns/supplier
+if ($_SERVER['REQUEST_URI'] === '/returns/supplier' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $returnController->supplier();
     exit;
 }
 

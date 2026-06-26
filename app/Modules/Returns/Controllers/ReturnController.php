@@ -105,6 +105,14 @@ class ReturnController extends Controller
         ]);
     }
 
+    /**
+     * Supplier return view
+     */
+    public function supplierView(): void
+    {
+        $this->view('returns.supplier');
+    }
+
     public function supplier(): void
     {
         $request = new Request();
