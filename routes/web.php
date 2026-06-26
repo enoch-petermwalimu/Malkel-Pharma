@@ -264,6 +264,12 @@ if ($_SERVER['REQUEST_URI'] === '/returns/store' && $_SERVER['REQUEST_METHOD'] =
     exit;
 }
 
+// Route: POST /returns/customer
+if ($_SERVER['REQUEST_URI'] === '/returns/customer' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $returnController->customer();
+    exit;
+}
+
 // Route: GET /returns/show
 if (str_starts_with($_SERVER['REQUEST_URI'], '/returns/show') && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $returnController->show();

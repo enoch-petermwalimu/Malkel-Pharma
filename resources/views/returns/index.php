@@ -363,7 +363,7 @@ async function submitReturn()
 
     const response =
         await fetch(
-            '/returns/customer',
+            '/returns/store',
             {
                 method:'POST',
 
