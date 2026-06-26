@@ -242,3 +242,30 @@ if ($_SERVER['REQUEST_URI'] === '/reports/revenue-between' && $_SERVER['REQUEST_
     $reportController->revenueBetween();
     exit;
 }
+
+// Return routes
+$returnController = new \App\Modules\Returns\Controllers\ReturnController();
+
+// Route: GET /returns
+if ($_SERVER['REQUEST_URI'] === '/returns' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $returnController->index();
+    exit;
+}
+
+// Route: GET /returns/create
+if ($_SERVER['REQUEST_URI'] === '/returns/create' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $returnController->create();
+    exit;
+}
+
+// Route: POST /returns/store
+if ($_SERVER['REQUEST_URI'] === '/returns/store' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $returnController->store();
+    exit;
+}
+
+// Route: GET /returns/show
+if (str_starts_with($_SERVER['REQUEST_URI'], '/returns/show') && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $returnController->show();
+    exit;
+}
