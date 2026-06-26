@@ -44,4 +44,22 @@ abstract class BaseRepository
         return $this->db->lastInsertId();
     }
 
+    /**
+     * Create a record
+     */
+    public function create(array $data): bool
+    {
+        $columns = array_keys($data);
+        $placeholders = array_map(fn($col) => ':' . $col, $columns);
+
+        $sql = sprintf(
+            "INSERT INTO %s (%s) VALUES (%s)",
+            $this->table,
+            implode(', ', $columns),
+            implode(', ', $placeholders)
+        );
+
+        $statement = $this->db->prepare($sql);
+        return $statement->execute($data);
+    }
 }

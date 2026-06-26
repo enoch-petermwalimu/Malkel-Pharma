@@ -64,5 +64,22 @@ class InventoryRepository extends BaseRepository
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    
+    /**
+     * Create a batch record
+     */
+    public function create(array $data): bool
+    {
+        $columns = array_keys($data);
+        $placeholders = array_map(fn($col) => ':' . $col, $columns);
+
+        $sql = sprintf(
+            "INSERT INTO %s (%s) VALUES (%s)",
+            $this->table,
+            implode(', ', $columns),
+            implode(', ', $placeholders)
+        );
+
+        $statement = $this->db->prepare($sql);
+        return $statement->execute($data);
+    }
 }

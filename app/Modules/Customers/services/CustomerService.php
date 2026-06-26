@@ -21,6 +21,11 @@ class CustomerService
         $this->repository = new CustomerRepository();
     }
 
+    public function all(): array
+    {
+        return $this->repository->all();
+    }
+
     public function search(string $query): array
     {
         return $this->repository->search($query);
@@ -29,5 +34,10 @@ class CustomerService
     public function create(array $data): bool
     {
         return $this->model->create($data);
+    }
+
+    public function lastInsertId(): string|false
+    {
+        return $this->model->lastInsertId();
     }
 }

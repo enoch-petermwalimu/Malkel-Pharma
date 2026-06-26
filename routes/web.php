@@ -2,6 +2,9 @@
 
 use App\Modules\Settings\Controllers\SettingsController;
 use App\Modules\Products\Controllers\ProductController;
+use App\Modules\Inventory\Controllers\InventoryController;
+use App\Modules\Customers\Controllers\CustomerController;
+use App\Modules\Sales\Controllers\SaleController;
 
 // Settings routes
 $settingsController = new SettingsController();
@@ -54,5 +57,92 @@ if ($_SERVER['REQUEST_URI'] === '/products/update' && $_SERVER['REQUEST_METHOD']
 // Route: GET /products/search
 if ($_SERVER['REQUEST_URI'] === '/products/search' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $productController->search();
+    exit;
+}
+
+// Inventory routes
+$inventoryController = new InventoryController();
+
+// Route: GET /inventory
+if ($_SERVER['REQUEST_URI'] === '/inventory' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $inventoryController->index();
+    exit;
+}
+
+// Route: GET /inventory/create-batch
+if ($_SERVER['REQUEST_URI'] === '/inventory/create-batch' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $inventoryController->createBatchView();
+    exit;
+}
+
+// Route: POST /inventory/store-batch
+if ($_SERVER['REQUEST_URI'] === '/inventory/store-batch' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $inventoryController->storeBatch();
+    exit;
+}
+
+// Route: POST /inventory/adjust
+if ($_SERVER['REQUEST_URI'] === '/inventory/adjust' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $inventoryController->adjust();
+    exit;
+}
+
+// Route: POST /inventory/expired
+if ($_SERVER['REQUEST_URI'] === '/inventory/expired' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $inventoryController->expired();
+    exit;
+}
+
+// Route: POST /inventory/damaged
+if ($_SERVER['REQUEST_URI'] === '/inventory/damaged' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $inventoryController->damaged();
+    exit;
+}
+
+// Route: POST /inventory/update
+if ($_SERVER['REQUEST_URI'] === '/inventory/update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $inventoryController->update();
+    exit;
+}
+
+// Customer routes
+$customerController = new CustomerController();
+
+// Route: GET /customers
+if ($_SERVER['REQUEST_URI'] === '/customers' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $customerController->index();
+    exit;
+}
+
+// Route: GET /customers/search
+if ($_SERVER['REQUEST_URI'] === '/customers/search' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $customerController->search();
+    exit;
+}
+
+// Route: POST /customers/store
+if ($_SERVER['REQUEST_URI'] === '/customers/store' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $customerController->store();
+    exit;
+}
+
+// POS routes
+$saleController = new SaleController();
+
+// Route: GET /pos
+if ($_SERVER['REQUEST_URI'] === '/pos' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $saleController->index();
+    exit;
+}
+
+// Route: POST /pos/checkout
+if ($_SERVER['REQUEST_URI'] === '/pos/checkout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $saleController->checkout();
+    exit;
+}
+
+// Route: GET /pos/invoice-lookup
+if ($_SERVER['REQUEST_URI'] === '/pos/invoice-lookup' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $saleController->invoiceLookup();
     exit;
 }

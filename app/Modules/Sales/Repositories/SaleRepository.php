@@ -328,9 +328,9 @@ public function revenueDays(int $days): float
     return (float)($result['revenue'] ?? 0);
 }
 
-    public function latestSales(): array
+    public function latestSales(int $limit = 100): array
     {
-        $statement = $this->db->query(
+        $statement = $this->db->prepare(
             "
             SELECT
                 s.*,
@@ -339,11 +339,113 @@ public function revenueDays(int $days): float
             LEFT JOIN customers c
                 ON c.id = s.customer_id
             ORDER BY s.created_at DESC
-            LIMIT 100
+            LIMIT :limit
             "
         );
 
+        $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $statement->execute();
+
         return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Create sale record
+     */
+    public function create(array $data): bool
+    {
+        $statement = $this->db->prepare("
+            INSERT INTO sales (
+                invoice_number,
+                customer_id,
+                user_id,
+                subtotal,
+                discount,
+                vat,
+                total,
+                payment_method,
+                amount_received,
+                status
+            ) VALUES (
+                :invoice_number,
+                :customer_id,
+                :user_id,
+                :subtotal,
+                :discount,
+                :vat,
+                :total,
+                :payment_method,
+                :amount_received,
+                :status
+            )
+        ");
+
+        return $statement->execute([
+            'invoice_number' => $data['invoice_number'],
+            'customer_id' => $data['customer_id'],
+            'user_id' => $data['user_id'],
+            'subtotal' => $data['subtotal'],
+            'discount' => $data['discount'],
+            'vat' => $data['vat'],
+            'total' => $data['total'],
+            'payment_method' => $data['payment_method'],
+            'amount_received' => $data['amount_received'],
+            'status' => $data['status']
+        ]);
+    }
+
+    /**
+     * Create sale item
+     */
+    public function createItem(array $data): bool
+    {
+        $statement = $this->db->prepare("
+            INSERT INTO sale_items (
+                sale_id,
+                product_id,
+                quantity,
+                unit_price,
+                total_price
+            ) VALUES (
+                :sale_id,
+                :product_id,
+                :quantity,
+                :unit_price,
+                :total_price
+            )
+        ");
+
+        return $statement->execute([
+            'sale_id' => $data['sale_id'],
+            'product_id' => $data['product_id'],
+            'quantity' => $data['quantity'],
+            'unit_price' => $data['unit_price'],
+            'total_price' => $data['total_price']
+        ]);
+    }
+
+    /**
+     * Create payment record
+     */
+    public function createPayment(array $data): bool
+    {
+        $statement = $this->db->prepare("
+            INSERT INTO sale_payments (
+                sale_id,
+                payment_method,
+                amount
+            ) VALUES (
+                :sale_id,
+                :payment_method,
+                :amount
+            )
+        ");
+
+        return $statement->execute([
+            'sale_id' => $data['sale_id'],
+            'payment_method' => $data['payment_method'],
+            'amount' => $data['amount']
+        ]);
     }
 
     public function history(): array
