@@ -28,7 +28,7 @@
         onclick="openCreateModal()"
         class="btn"
     >
-        <i class="fa-solid fa-plus"></i>
+        <i class="bi bi-plus-lg"></i>
         Ajouter Fournisseur
     </button>
 
@@ -101,7 +101,7 @@
                     <?= json_encode($supplier) ?>
                 )'
             >
-                <i class="fa-solid fa-pen"></i>
+                <i class="bi bi-pencil"></i>
                 Modifier
             </button>
 
@@ -111,7 +111,7 @@
                     <?= $supplier['id'] ?>
                 )"
             >
-                <i class="fa-solid fa-trash"></i>
+                <i class="bi bi-trash"></i>
                 Supprimer
             </button>
 

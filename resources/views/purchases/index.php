@@ -27,7 +27,7 @@
 
 <div class="glass rounded-3xl p-12 text-center">
 
-    <i class="fa-solid fa-truck text-5xl text-slate-500 mb-4"></i>
+    <i class="bi bi-truck text-5xl text-slate-500 mb-4"></i>
 
     <h3 class="text-xl font-bold mb-2">
         Aucun achat enregistré
