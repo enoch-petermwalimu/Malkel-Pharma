@@ -35,6 +35,8 @@ class ReturnController extends Controller
      */
     public function create(): void
     {
+        $this->requirePharmacist();
+
         $this->view('returns.create');
     }
 

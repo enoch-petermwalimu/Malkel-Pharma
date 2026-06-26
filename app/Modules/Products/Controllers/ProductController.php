@@ -35,6 +35,8 @@ class ProductController extends Controller
      */
     public function create(): void
     {
+        $this->requirePharmacist();
+
         $db = \App\Core\Database::connect();
 
         $categories = $db->query("

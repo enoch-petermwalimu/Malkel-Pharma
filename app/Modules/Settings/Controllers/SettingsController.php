@@ -19,6 +19,8 @@ class SettingsController extends Controller
      */
     public function index(): void
     {
+        $this->requireAdmin();
+
         $settings = $this->settingsService->all();
 
         require dirname(__DIR__, 4)
@@ -30,6 +32,8 @@ class SettingsController extends Controller
      */
     public function update(): void
     {
+        $this->requireAdmin();
+
         $this->settingsService->set('pharmacy_name', $_POST['pharmacy_name'] ?? '');
         $this->settingsService->set('phone', $_POST['phone'] ?? '');
         $this->settingsService->set('email', $_POST['email'] ?? '');

@@ -101,6 +101,8 @@ class SaleController extends Controller
      */
     public function cancel(): void
     {
+        $this->requireAdmin();
+
         $request = new Request();
 
         $data = $request->body();

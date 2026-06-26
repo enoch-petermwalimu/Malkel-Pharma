@@ -92,6 +92,8 @@ class SupplierController extends Controller
  */
 public function delete(): void
 {
+    $this->requireAdmin();
+
     $id =
         (int) ($_POST['id'] ?? 0);
 

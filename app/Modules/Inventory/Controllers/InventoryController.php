@@ -97,6 +97,8 @@ class InventoryController extends Controller
 
     public function createBatchView(): void
     {
+        $this->requirePharmacist();
+
         $this->view(
             'inventory.create-batch'
         );

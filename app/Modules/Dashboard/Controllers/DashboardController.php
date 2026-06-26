@@ -16,6 +16,8 @@ class DashboardController extends Controller
 {
     public function index(): void
     {
+        $this->requireAuth();
+
         $salesRepo = new SaleRepository();
         $inventoryRepo = new InventoryRepository();
 
