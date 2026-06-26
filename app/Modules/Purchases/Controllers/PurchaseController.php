@@ -56,15 +56,4 @@ class PurchaseController extends Controller
         ]);
     }
 
-    /**
-     * History
-     */
-    public function history(): void
-    {
-        $purchases = $this->service->history();
-
-        $this->view('purchases.index', [
-            'purchases' => $purchases
-        ]);
-    }
 }

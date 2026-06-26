@@ -117,26 +117,4 @@ class PurchaseRepository extends BaseRepository
         );
     }
 
-/**
- * Historique achats
- */
-public function history(): array
-{
-    $statement =
-        $this->db->query(
-            "
-            SELECT
-                p.*,
-                s.company_name
-            FROM purchases p
-            LEFT JOIN suppliers s
-                ON s.id = p.supplier_id
-            ORDER BY p.id DESC
-            "
-        );
-
-    return $statement->fetchAll(
-        PDO::FETCH_ASSOC
-    );
-}    
 }

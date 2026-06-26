@@ -172,7 +172,7 @@ if ($_SERVER['REQUEST_URI'] === '/purchases/store' && $_SERVER['REQUEST_METHOD']
 
 // Route: GET /purchases/history
 if ($_SERVER['REQUEST_URI'] === '/purchases/history' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    $purchaseController->history();
+    $purchaseController->index();
     exit;
 }
 

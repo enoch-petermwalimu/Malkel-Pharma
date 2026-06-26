@@ -184,7 +184,7 @@ class PurchaseService
     public function history(): array
     {
         return $this->repository
-            ->history();
+            ->allPurchases();
     }
 
 }
