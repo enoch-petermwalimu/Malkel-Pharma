@@ -71,7 +71,7 @@ class ProductController extends Controller
 
         $data = $request->body();
 
-        $this->service->create([
+        $created = $this->service->create([
             'name' => $data['name'] ?? '',
             'barcode' => $data['barcode'] ?? null,
             'sku' => $data['sku'] ?? null,
@@ -91,6 +91,27 @@ class ProductController extends Controller
             'therapeutic_class' => $data['therapeutic_class'] ?? null,
             'product_type' => $data['product_type'] ?? 'generic',
         ]);
+
+        if ($created) {
+            // Get the last inserted product ID
+            $productId = (int) $this->service->findLastInsertId();
+
+            // Automatically create inventory batch if stock quantity was provided
+            $stockQty = (int) ($data['stock_quantity'] ?? 0);
+            if ($stockQty > 0 && $productId > 0) {
+                $inventoryService = new \App\Modules\Inventory\Services\InventoryService();
+                $inventoryService->receiveStock([
+                    'product_id' => $productId,
+                    'batch_number' => $data['batch_number'] ?? 'INIT-' . time(),
+                    'expiry_date' => $data['expiry_date'] ?? date('Y-m-d', strtotime('+5 years')),
+                    'quantity' => $stockQty,
+                    'supplier' => null,
+                    'purchase_price' => $data['purchase_price'] ?? 0,
+                    'selling_price' => $data['price'] ?? 0,
+                    'minimum_stock_level' => $data['minimum_stock_level'] ?? 5
+                ]);
+            }
+        }
 
         $this->redirect('/products');
     }

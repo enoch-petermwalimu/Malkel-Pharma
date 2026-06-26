@@ -96,4 +96,12 @@ class ProductsService
     {
         return $this->product->findByBarcode($barcode);
     }
+
+    /**
+     * Get last inserted product ID
+     */
+    public function findLastInsertId(): string|false
+    {
+        return $this->product->lastInsertId();
+    }
 }
