@@ -235,12 +235,26 @@ class PurchaseService
                 $batch = $batchStmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($batch) {
+                    // Only cancel if the batch hasn't been partially consumed
+                    // If quantity is less than the original purchase quantity, 
+                    // some stock has already been sold
+                    $originalQty = (int) $item['quantity'];
+                    $currentQty = (int) $batch['quantity'];
+
+                    if ($currentQty < $originalQty) {
+                        throw new Exception(
+                            'Cannot cancel purchase: batch #' . $batch['id'] . 
+                            ' has been partially consumed (' . $currentQty . 
+                            ' remaining of ' . $originalQty . ')'
+                        );
+                    }
+
                     // Create reversal movement log
                     $this->inventory->createMovement([
                         'product_id' => $item['product_id'],
                         'batch_id' => $batch['id'],
                         'movement_type' => 'purchase_cancellation',
-                        'quantity' => $batch['quantity'],
+                        'quantity' => $currentQty,
                         'notes' => 'Purchase cancelled #' . $purchase['purchase_number']
                     ]);
 

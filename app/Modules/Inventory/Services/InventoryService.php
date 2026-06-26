@@ -175,6 +175,19 @@ class InventoryService
 
             $this->db->beginTransaction();
 
+            // Validate product exists
+            $productStmt = $this->db->prepare(
+                "SELECT id FROM products WHERE id = :id LIMIT 1"
+            );
+            $productStmt->execute(['id' => $data['product_id']]);
+            $product = $productStmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$product) {
+                throw new Exception(
+                    'Product not found: ' . $data['product_id']
+                );
+            }
+
             $created = $this->batchModel->create([
 
                 'product_id'     => $data['product_id'],

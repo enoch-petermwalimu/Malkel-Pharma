@@ -148,10 +148,14 @@ class SaleService
                 /**
                  * Stock deduction
                  */
-                $deducted = $this->inventory->deductStock(
-                    (int) $item['product_id'],
-                    (int) $item['quantity']
-                );
+                try {
+                    $deducted = $this->inventory->deductStock(
+                        (int) $item['product_id'],
+                        (int) $item['quantity']
+                    );
+                } catch (\Exception $e) {
+                    throw new \Exception('Insufficient stock for product: ' . $product['name']);
+                }
 
                 if (!$deducted) {
                     throw new \Exception('Insufficient stock for product: ' . $product['name']);
