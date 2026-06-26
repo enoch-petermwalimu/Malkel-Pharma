@@ -181,6 +181,15 @@ class InventoryController extends Controller
                 // Log error or handle failure
             }
 
+            // Create movement log for the update
+            $this->service->createMovement([
+                'product_id' => $existing['product_id'],
+                'batch_id' => $batchId,
+                'movement_type' => 'batch_update',
+                'quantity' => 0,
+                'notes' => 'Batch details updated'
+            ]);
+
             $this->redirect('/inventory');
         }
 }
