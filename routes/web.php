@@ -208,3 +208,18 @@ if ($_SERVER['REQUEST_URI'] === '/suppliers/delete' && $_SERVER['REQUEST_METHOD'
     $supplierController->delete();
     exit;
 }
+
+// Report routes
+$reportController = new \App\Modules\Reports\Controllers\ReportController();
+
+// Route: GET /reports
+if ($_SERVER['REQUEST_URI'] === '/reports' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $reportController->index();
+    exit;
+}
+
+// Route: POST /reports/revenue-between
+if ($_SERVER['REQUEST_URI'] === '/reports/revenue-between' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $reportController->revenueBetween();
+    exit;
+}

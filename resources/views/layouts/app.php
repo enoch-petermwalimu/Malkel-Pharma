@@ -215,7 +215,7 @@ href="/reports"
 class="<?= str_starts_with($currentRoute,'/reports') ? 'active' : '' ?>"
 >
 <i class="fa-solid fa-chart-column"></i>
-<span class="nav-text">Reports</span>
+<span class="nav-text">Financial Reports</span>
 </a>
 
 <a
