@@ -74,30 +74,22 @@ class ProductController extends Controller
         $this->service->create([
             'name' => $data['name'] ?? '',
             'barcode' => $data['barcode'] ?? null,
+            'sku' => $data['sku'] ?? null,
             'strength' => $data['strength'] ?? null,
-
-            'price' => $data['price'] ?? 0,
+            'category_id' => $data['category_id'] ?? null,
+            'dosage_form_id' => $data['dosage_form_id'] ?? null,
+            'packaging_unit_id' => $data['packaging_unit_id'] ?? null,
             'purchase_price' => $data['purchase_price'] ?? 0,
-
-            'stock_quantity' => $data['stock_quantity'] ?? 0,
-
-            'minimum_stock_level' =>
-                $data['minimum_stock_level'] ?? 0,
-
-            'category_id' =>
-                $data['category_id'] ?? null,
-
-            'dosage_form_id' =>
-                $data['dosage_form_id'] ?? null,
-
-            'packaging_unit_id' =>
-                $data['packaging_unit_id'] ?? null,
-
-            'prescription_required' =>
-                isset($data['prescription_required']) ? 1 : 0,
-
-            'is_temperature_sensitive' =>
-                isset($data['is_temperature_sensitive']) ? 1 : 0
+            'selling_price' => $data['price'] ?? 0,
+            'minimum_stock_level' => $data['minimum_stock_level'] ?? 0,
+            'description' => $data['description'] ?? null,
+            'prescription_required' => isset($data['prescription_required']) ? 1 : 0,
+            'is_temperature_sensitive' => isset($data['is_temperature_sensitive']) ? 1 : 0,
+            'storage_temperature' => $data['storage_temperature'] ?? null,
+            'active_ingredient' => $data['active_ingredient'] ?? null,
+            'manufacturer' => $data['manufacturer'] ?? null,
+            'therapeutic_class' => $data['therapeutic_class'] ?? null,
+            'product_type' => $data['product_type'] ?? 'generic',
         ]);
 
         $this->redirect('/products');
@@ -111,17 +103,14 @@ public function edit(): void
 {
     $id = $_GET['id'] ?? 0;
 
+    $product = $this->service->find((int) $id);
+
+    if (!$product) {
+        $this->redirect('/products');
+        return;
+    }
+
     $db = \App\Core\Database::connect();
-
-    $stmt = $db->prepare("
-        SELECT *
-        FROM products
-        WHERE id = ?
-    ");
-
-    $stmt->execute([$id]);
-
-    $product = $stmt->fetch();
 
     $categories = $db->query("
         SELECT *
@@ -157,54 +146,25 @@ public function update(): void
 {
     $id = $_POST['id'] ?? 0;
 
-    $db = \App\Core\Database::connect();
-
-    $stmt = $db->prepare("
-        UPDATE products
-        SET
-            name = ?,
-            barcode = ?,
-            strength = ?,
-            selling_price = ?,
-            purchase_price = ?,
-            minimum_stock_level = ?,
-            category_id = ?,
-            dosage_form_id = ?,
-            packaging_unit_id = ?,
-            prescription_required = ?,
-            is_temperature_sensitive = ?
-        WHERE id = ?
-    ");
-
-    $stmt->execute([
-
-        $_POST['name'] ?? '',
-
-        $_POST['barcode'] ?? '',
-
-        $_POST['strength'] ?? '',
-
-        $_POST['price'] ?? 0,
-
-        $_POST['purchase_price'] ?? 0,
-
-        $_POST['minimum_stock_level'] ?? 0,
-
-        $_POST['category_id'] ?? null,
-
-        $_POST['dosage_form_id'] ?? null,
-
-        $_POST['packaging_unit_id'] ?? null,
-
-        isset($_POST['prescription_required'])
-            ? 1
-            : 0,
-
-        isset($_POST['is_temperature_sensitive'])
-            ? 1
-            : 0,
-
-        $id
+    $this->service->update((int) $id, [
+        'name' => $_POST['name'] ?? '',
+        'barcode' => $_POST['barcode'] ?? '',
+        'sku' => $_POST['sku'] ?? '',
+        'strength' => $_POST['strength'] ?? '',
+        'category_id' => $_POST['category_id'] ?? null,
+        'dosage_form_id' => $_POST['dosage_form_id'] ?? null,
+        'packaging_unit_id' => $_POST['packaging_unit_id'] ?? null,
+        'purchase_price' => $_POST['purchase_price'] ?? 0,
+        'selling_price' => $_POST['price'] ?? 0,
+        'minimum_stock_level' => $_POST['minimum_stock_level'] ?? 0,
+        'description' => $_POST['description'] ?? null,
+        'prescription_required' => isset($_POST['prescription_required']) ? 1 : 0,
+        'is_temperature_sensitive' => isset($_POST['is_temperature_sensitive']) ? 1 : 0,
+        'storage_temperature' => $_POST['storage_temperature'] ?? null,
+        'active_ingredient' => $_POST['active_ingredient'] ?? null,
+        'manufacturer' => $_POST['manufacturer'] ?? null,
+        'therapeutic_class' => $_POST['therapeutic_class'] ?? null,
+        'product_type' => $_POST['product_type'] ?? 'generic',
     ]);
 
     $this->redirect('/products');
@@ -228,49 +188,7 @@ public function update(): void
             exit;
         }
 
-        $db = \App\Core\Database::connect();
-
-        $stmt = $db->prepare("
-            SELECT
-                p.id,
-                p.name,
-                p.strength,
-                p.selling_price,
-
-                COALESCE(
-                    SUM(b.quantity),
-                    0
-                ) AS stock
-
-            FROM products p
-
-            LEFT JOIN inventory_batches b
-                ON b.product_id = p.id
-
-            WHERE
-                p.name LIKE ?
-                OR p.barcode LIKE ?
-
-            GROUP BY
-                p.id,
-                p.name,
-                p.strength,
-                p.selling_price
-
-            ORDER BY p.name ASC
-
-            LIMIT 20
-        ");
-
-        $stmt->execute([
-            '%' . $term . '%',
-            '%' . $term . '%'
-        ]);
-
-        $products =
-            $stmt->fetchAll(
-                \PDO::FETCH_ASSOC
-            );
+        $products = $this->service->search($term);
 
         header(
             'Content-Type: application/json'
