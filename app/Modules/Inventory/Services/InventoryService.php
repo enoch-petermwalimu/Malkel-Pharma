@@ -341,7 +341,7 @@ class InventoryService
                     "
                     UPDATE inventory_batches
                     SET quantity = quantity - :qty
-                    WHERE id = :id
+                    WHERE id = :id AND quantity >= :qty
                     "
                 );
 
@@ -349,6 +349,13 @@ class InventoryService
                     'qty' => $deduct,
                     'id' => $batch['id']
                 ]);
+
+                // Verify the update affected a row (quantity was sufficient)
+                if ($update->rowCount() === 0) {
+                    throw new Exception(
+                        'Stock inconsistency detected for batch #' . $batch['id']
+                    );
+                }
 
                 /**
                  * Movement log
