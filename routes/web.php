@@ -5,6 +5,8 @@ use App\Modules\Products\Controllers\ProductController;
 use App\Modules\Inventory\Controllers\InventoryController;
 use App\Modules\Customers\Controllers\CustomerController;
 use App\Modules\Sales\Controllers\SaleController;
+use App\Modules\Purchases\Controllers\PurchaseController;
+use App\Modules\Suppliers\Controllers\SupplierController;
 
 // Settings routes
 $settingsController = new SettingsController();
@@ -144,5 +146,65 @@ if ($_SERVER['REQUEST_URI'] === '/pos/checkout' && $_SERVER['REQUEST_METHOD'] ==
 // Route: GET /pos/invoice-lookup
 if ($_SERVER['REQUEST_URI'] === '/pos/invoice-lookup' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $saleController->invoiceLookup();
+    exit;
+}
+
+// Purchase routes
+$purchaseController = new PurchaseController();
+
+// Route: GET /purchases
+if ($_SERVER['REQUEST_URI'] === '/purchases' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $purchaseController->index();
+    exit;
+}
+
+// Route: GET /purchases/create
+if ($_SERVER['REQUEST_URI'] === '/purchases/create' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $purchaseController->create();
+    exit;
+}
+
+// Route: POST /purchases/store
+if ($_SERVER['REQUEST_URI'] === '/purchases/store' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $purchaseController->store();
+    exit;
+}
+
+// Route: GET /purchases/history
+if ($_SERVER['REQUEST_URI'] === '/purchases/history' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $purchaseController->history();
+    exit;
+}
+
+// Supplier routes
+$supplierController = new SupplierController();
+
+// Route: GET /suppliers
+if ($_SERVER['REQUEST_URI'] === '/suppliers' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $supplierController->index();
+    exit;
+}
+
+// Route: POST /suppliers/store
+if ($_SERVER['REQUEST_URI'] === '/suppliers/store' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $supplierController->store();
+    exit;
+}
+
+// Route: GET /suppliers/search
+if ($_SERVER['REQUEST_URI'] === '/suppliers/search' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $supplierController->search();
+    exit;
+}
+
+// Route: POST /suppliers/update
+if ($_SERVER['REQUEST_URI'] === '/suppliers/update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $supplierController->update();
+    exit;
+}
+
+// Route: POST /suppliers/delete
+if ($_SERVER['REQUEST_URI'] === '/suppliers/delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $supplierController->delete();
     exit;
 }

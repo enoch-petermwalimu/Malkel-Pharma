@@ -9,149 +9,44 @@
         </h2>
 
         <p class="text-slate-400">
-            Réception des marchandises fournisseurs
+            Historique des achats et réceptions fournisseurs
         </p>
 
     </div>
 
     <a
-        href="/purchases/history"
-        class="px-4 py-2 bg-slate-700 rounded-xl"
+        href="/purchases/create"
+        class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold"
     >
-        Historique
+        Nouvel Achat
     </a>
 
 </div>
 
-<!-- FOURNISSEUR -->
+<?php if (empty($purchases ?? [])): ?>
 
-<div class="glass rounded-3xl p-6 mb-6">
+<div class="glass rounded-3xl p-12 text-center">
 
-    <h3 class="font-bold mb-4">
-        Fournisseur
+    <i class="fa-solid fa-truck text-5xl text-slate-500 mb-4"></i>
+
+    <h3 class="text-xl font-bold mb-2">
+        Aucun achat enregistré
     </h3>
 
-    <input
-        type="text"
-        id="supplier-search"
-        placeholder="Rechercher un fournisseur..."
-        class="w-full p-3 rounded-xl bg-slate-800"
-    >
+    <p class="text-slate-400 mb-6">
+        Commencez par créer votre premier bon de commande.
+    </p>
 
-    <input
-        type="hidden"
-        id="supplier_id"
+    <a
+        href="/purchases/create"
+        class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold"
     >
-
-    <div
-        id="supplier-results"
-        class="mt-3"
-    ></div>
+        Créer un achat
+    </a>
 
 </div>
 
-<!-- AJOUT PRODUIT -->
-
-<div class="glass rounded-3xl p-6 mb-6">
-
-    <h3 class="font-bold mb-4">
-        Ajouter un produit
-    </h3>
-
-    <div class="grid grid-cols-5 gap-4">
-
-        <div>
-
-            <label>
-                Produit
-            </label>
-
-            <input
-                type="text"
-                id="product-search"
-                class="w-full p-3 rounded-xl bg-slate-800"
-            >
-
-            <input
-                type="hidden"
-                id="product_id"
-            >
-
-            <div
-                id="product-results"
-            ></div>
-
-        </div>
-
-        <div>
-
-            <label>
-                Quantité
-            </label>
-
-            <input
-                type="number"
-                id="quantity"
-                class="w-full p-3 rounded-xl bg-slate-800"
-            >
-
-        </div>
-
-        <div>
-
-            <label>
-                Prix Achat
-            </label>
-
-            <input
-                type="number"
-                step="0.01"
-                id="unit_cost"
-                class="w-full p-3 rounded-xl bg-slate-800"
-            >
-
-        </div>
-
-        <div>
-
-            <label>
-                Expiration
-            </label>
-
-            <input
-                type="date"
-                id="expiry_date"
-                class="w-full p-3 rounded-xl bg-slate-800"
-            >
-
-        </div>
-
-        <div>
-
-            <label>
-                Lot
-            </label>
-
-            <input
-                type="text"
-                id="batch_number"
-                class="w-full p-3 rounded-xl bg-slate-800"
-            >
-
-        </div>
-
-    </div>
-
-    <button
-        id="add-product-btn"
-        class="mt-4 px-4 py-2 bg-blue-600 rounded-xl"
-    >
-        Ajouter
-    </button>
-
-</div>
-
-<!-- TABLEAU -->
+<?php else: ?>
 
 <div class="glass rounded-3xl overflow-hidden">
 
@@ -162,15 +57,11 @@
             <tr>
 
                 <th class="p-4 text-left">
-                    Produit
+                    N° Commande
                 </th>
 
                 <th class="p-4 text-left">
-                    Qté
-                </th>
-
-                <th class="p-4 text-left">
-                    Prix Achat
+                    Fournisseur
                 </th>
 
                 <th class="p-4 text-left">
@@ -178,11 +69,11 @@
                 </th>
 
                 <th class="p-4 text-left">
-                    Lot
+                    Statut
                 </th>
 
                 <th class="p-4 text-left">
-                    Expiration
+                    Date
                 </th>
 
                 <th class="p-4 text-left">
@@ -193,18 +84,96 @@
 
         </thead>
 
-        <tbody id="purchase-items">
+        <tbody>
 
-            <tr>
+            <?php foreach ($purchases as $purchase): ?>
 
-                <td
-                    colspan="7"
-                    class="p-6 text-center text-slate-400"
-                >
-                    Aucun produit ajouté
-                </td>
+                <tr class="border-t border-slate-800">
 
-            </tr>
+                    <td class="p-4">
+
+                        <strong>
+                            <?= htmlspecialchars(
+                                $purchase['purchase_number']
+                                ?? '-'
+                            ) ?>
+                        </strong>
+
+                    </td>
+
+                    <td class="p-4">
+
+                        <?= htmlspecialchars(
+                            $purchase['company_name']
+                            ?? '-'
+                        ) ?>
+
+                    </td>
+
+                    <td class="p-4">
+
+                        $
+
+                        <?= number_format(
+                            (float) ($purchase['total'] ?? 0),
+                            2
+                        ) ?>
+
+                    </td>
+
+                    <td class="p-4">
+
+                        <?php
+                        $status =
+                            $purchase['payment_status']
+                            ?? 'pending';
+                        ?>
+
+                        <?php if ($status === 'paid'): ?>
+
+                            <span class="text-green-500">
+                                Payé
+                            </span>
+
+                        <?php elseif ($status === 'pending'): ?>
+
+                            <span class="text-yellow-500">
+                                En attente
+                            </span>
+
+                        <?php else: ?>
+
+                            <span class="text-red-500">
+                                <?= htmlspecialchars($status) ?>
+                            </span>
+
+                        <?php endif; ?>
+
+                    </td>
+
+                    <td class="p-4">
+
+                        <?= htmlspecialchars(
+                            $purchase['created_at']
+                            ?? '-'
+                        ) ?>
+
+                    </td>
+
+                    <td class="p-4">
+
+                        <a
+                            href="#"
+                            class="text-blue-500 hover:text-blue-400"
+                        >
+                            Détails
+                        </a>
+
+                    </td>
+
+                </tr>
+
+            <?php endforeach; ?>
 
         </tbody>
 
@@ -212,34 +181,7 @@
 
 </div>
 
-<!-- TOTAL -->
-
-<div class="mt-6 text-right">
-
-    <h2 class="text-2xl font-bold">
-
-        Total :
-
-        <span id="purchase-total">
-            0.00
-        </span>
-
-    </h2>
-
-</div>
-
-<!-- ACTION -->
-
-<div class="mt-6">
-
-    <button
-        id="save-purchase-btn"
-        class="px-6 py-3 bg-green-600 rounded-xl"
-    >
-        Valider Achat
-    </button>
-
-</div>
+<?php endif; ?>
 
 <?php
 

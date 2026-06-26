@@ -24,7 +24,19 @@ class PurchaseController extends Controller
      */
     public function index(): void
     {
-        $this->view('purchases.index');
+        $purchases = $this->service->history();
+
+        $this->view('purchases.index', [
+            'purchases' => $purchases
+        ]);
+    }
+
+    /**
+     * Create form
+     */
+    public function create(): void
+    {
+        $this->view('purchases.create');
     }
 
     /**
@@ -41,6 +53,18 @@ class PurchaseController extends Controller
 
         $this->json([
             'success' => $success
+        ]);
+    }
+
+    /**
+     * History
+     */
+    public function history(): void
+    {
+        $purchases = $this->service->history();
+
+        $this->view('purchases.index', [
+            'purchases' => $purchases
         ]);
     }
 }
