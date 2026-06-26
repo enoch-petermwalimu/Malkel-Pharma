@@ -194,8 +194,11 @@ public function saleItems(
                 LEFT JOIN users u
                     ON u.id = s.user_id
 
-                LEFT JOIN sale_payments sp
-                    ON sp.sale_id = s.id
+                LEFT JOIN (
+                    SELECT sale_id, payment_method, amount
+                    FROM sale_payments
+                    GROUP BY sale_id
+                ) sp ON sp.sale_id = s.id
 
                 WHERE s.id = :id
 
