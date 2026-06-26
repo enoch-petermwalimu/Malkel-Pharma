@@ -117,4 +117,26 @@ class PurchaseRepository extends BaseRepository
         );
     }
 
+    /**
+     * Get purchase items
+     */
+    public function getItems(int $purchaseId): array
+    {
+        $statement = $this->db->prepare(
+            "
+            SELECT *
+            FROM purchase_items
+            WHERE purchase_id = :purchase_id
+            "
+        );
+
+        $statement->execute([
+            'purchase_id' => $purchaseId
+        ]);
+
+        return $statement->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+    }
+
 }

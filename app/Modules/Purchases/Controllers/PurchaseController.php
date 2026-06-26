@@ -56,4 +56,31 @@ class PurchaseController extends Controller
         ]);
     }
 
+    /**
+     * Cancel purchase
+     */
+    public function cancel(): void
+    {
+        $request = new Request();
+
+        $data = $request->body();
+
+        $purchaseId = (int) ($data['id'] ?? 0);
+
+        if ($purchaseId <= 0) {
+            $this->json([
+                'success' => false,
+                'message' => 'Invalid purchase ID'
+            ], 400);
+            return;
+        }
+
+        $success = $this->service->cancel($purchaseId);
+
+        $this->json([
+            'success' => $success,
+            'message' => $success ? 'Purchase cancelled successfully' : 'Failed to cancel purchase'
+        ]);
+    }
+
 }

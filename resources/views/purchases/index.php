@@ -162,12 +162,22 @@
 
                     <td class="p-4">
 
-                        <a
-                            href="#"
-                            class="text-blue-500 hover:text-blue-400"
-                        >
-                            Détails
-                        </a>
+                        <?php if (($purchase['order_status'] ?? '') !== 'cancelled'): ?>
+
+                            <button
+                                onclick="cancelPurchase(<?= $purchase['id'] ?>)"
+                                class="text-red-500 hover:text-red-400"
+                            >
+                                Annuler
+                            </button>
+
+                        <?php else: ?>
+
+                            <span class="text-slate-500">
+                                Annulé
+                            </span>
+
+                        <?php endif; ?>
 
                     </td>
 
@@ -182,6 +192,35 @@
 </div>
 
 <?php endif; ?>
+
+<script>
+
+async function cancelPurchase(id) {
+    if (!confirm('Êtes-vous sûr de vouloir annuler cet achat ? Cette action est irréversible.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/purchases/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('Achat annulé avec succès');
+            location.reload();
+        } else {
+            alert('Erreur lors de l\'annulation : ' + (data.message || 'Erreur inconnue'));
+        }
+    } catch (error) {
+        alert('Erreur réseau');
+    }
+}
+
+</script>
 
 <?php
 

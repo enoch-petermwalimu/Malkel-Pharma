@@ -193,4 +193,91 @@ class PurchaseService
             ->allPurchases();
     }
 
+    /**
+     * ---------------------------------------------------------
+     * Cancel Purchase
+     * ---------------------------------------------------------
+     * Safely restores inventory consistency
+     */
+    public function cancel(int $purchaseId): bool
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // Get purchase details
+            $purchase = $this->repository->find($purchaseId);
+
+            if (!$purchase) {
+                throw new Exception('Purchase not found');
+            }
+
+            if ($purchase['order_status'] === 'cancelled') {
+                throw new Exception('Purchase already cancelled');
+            }
+
+            // Get purchase items to know which batches to remove
+            $items = $this->repository->getItems($purchaseId);
+
+            foreach ($items as $item) {
+                // Find the batch created by this purchase
+                $batchStmt = $this->db->prepare(
+                    "SELECT id, quantity FROM inventory_batches 
+                     WHERE product_id = :product_id 
+                     AND batch_number = :batch_number 
+                     AND expiry_date = :expiry_date
+                     ORDER BY id DESC LIMIT 1"
+                );
+                $batchStmt->execute([
+                    'product_id' => $item['product_id'],
+                    'batch_number' => $item['batch_number'] ?? '',
+                    'expiry_date' => $item['expiry_date'] ?? ''
+                ]);
+                $batch = $batchStmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($batch) {
+                    // Create reversal movement log
+                    $this->inventory->createMovement([
+                        'product_id' => $item['product_id'],
+                        'batch_id' => $batch['id'],
+                        'movement_type' => 'purchase_cancellation',
+                        'quantity' => $batch['quantity'],
+                        'notes' => 'Purchase cancelled #' . $purchase['purchase_number']
+                    ]);
+
+                    // Delete the batch
+                    $deleteStmt = $this->db->prepare(
+                        "DELETE FROM inventory_batches WHERE id = :id"
+                    );
+                    $deleteStmt->execute(['id' => $batch['id']]);
+                }
+            }
+
+            // Decrement supplier purchase stats
+            if (!empty($purchase['supplier_id'])) {
+                $updateSupplier = $this->db->prepare(
+                    "UPDATE suppliers 
+                     SET total_purchases = GREATEST(COALESCE(total_purchases, 1) - 1, 0)
+                     WHERE id = :supplier_id"
+                );
+                $updateSupplier->execute([
+                    'supplier_id' => $purchase['supplier_id']
+                ]);
+            }
+
+            // Mark purchase as cancelled
+            $updatePurchase = $this->db->prepare(
+                "UPDATE purchases SET order_status = 'cancelled', payment_status = 'cancelled' WHERE id = :id"
+            );
+            $updatePurchase->execute(['id' => $purchaseId]);
+
+            $this->db->commit();
+
+            return true;
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            return false;
+        }
+    }
+
 }

@@ -176,6 +176,12 @@ if ($_SERVER['REQUEST_URI'] === '/purchases/history' && $_SERVER['REQUEST_METHOD
     exit;
 }
 
+// Route: POST /purchases/cancel
+if ($_SERVER['REQUEST_URI'] === '/purchases/cancel' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $purchaseController->cancel();
+    exit;
+}
+
 // Supplier routes
 $supplierController = new SupplierController();
 
