@@ -42,6 +42,58 @@ class SaleService
     }
 
     /**
+     * Cancel a sale and restore inventory
+     */
+    public function cancelSale(int $saleId): bool
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // Get sale details
+            $sale = $this->repository->find($saleId);
+
+            if (!$sale) {
+                throw new \Exception('Sale not found');
+            }
+
+            if ($sale['sale_status'] === 'cancelled') {
+                throw new \Exception('Sale already cancelled');
+            }
+
+            // Get sale items to restore inventory
+            $items = $this->repository->saleItems($saleId);
+
+            foreach ($items as $item) {
+                // Restore inventory by creating a new batch
+                $this->inventory->receiveStock([
+                    'product_id' => $item['product_id'],
+                    'batch_number' => 'CANCEL-' . $sale['invoice_number'],
+                    'expiry_date' => date('Y-m-d', strtotime('+5 years')),
+                    'quantity' => $item['quantity'],
+                    'supplier' => null,
+                    'purchase_price' => 0,
+                    'selling_price' => $item['unit_price'],
+                    'minimum_stock_level' => 0
+                ]);
+            }
+
+            // Mark sale as cancelled
+            $updateSale = $this->db->prepare(
+                "UPDATE sales SET sale_status = 'cancelled', payment_status = 'refunded' WHERE id = :id"
+            );
+            $updateSale->execute(['id' => $saleId]);
+
+            $this->db->commit();
+
+            return true;
+
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            return false;
+        }
+    }
+
+    /**
      * Checkout complet
      */
     public function createSale(array $data): array|false
@@ -160,6 +212,23 @@ class SaleService
                 if (!$deducted) {
                     throw new \Exception('Insufficient stock for product: ' . $product['name']);
                 }
+            }
+
+            /**
+             * Update customer purchase history
+             */
+            if ($customerId) {
+                $updateCustomer = $this->db->prepare(
+                    "UPDATE customers 
+                     SET total_purchases = COALESCE(total_purchases, 0) + 1,
+                         total_spent = COALESCE(total_spent, 0) + :total,
+                         last_purchase_date = NOW()
+                     WHERE id = :customer_id"
+                );
+                $updateCustomer->execute([
+                    'total' => $total,
+                    'customer_id' => $customerId
+                ]);
             }
 
             /**

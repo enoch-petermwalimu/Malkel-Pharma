@@ -162,6 +162,12 @@ if (str_starts_with($_SERVER['REQUEST_URI'], '/sales/show') && $_SERVER['REQUEST
     exit;
 }
 
+// Route: POST /sales/cancel
+if ($_SERVER['REQUEST_URI'] === '/sales/cancel' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $saleController->cancel();
+    exit;
+}
+
 // Purchase routes
 $purchaseController = new PurchaseController();
 

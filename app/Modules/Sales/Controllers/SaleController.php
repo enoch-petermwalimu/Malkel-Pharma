@@ -97,6 +97,33 @@ class SaleController extends Controller
     }
 
     /**
+     * Cancel sale
+     */
+    public function cancel(): void
+    {
+        $request = new Request();
+
+        $data = $request->body();
+
+        $saleId = (int) ($data['id'] ?? 0);
+
+        if ($saleId <= 0) {
+            $this->json([
+                'success' => false,
+                'message' => 'Invalid sale ID'
+            ], 400);
+            return;
+        }
+
+        $success = $this->service->cancelSale($saleId);
+
+        $this->json([
+            'success' => $success,
+            'message' => $success ? 'Sale cancelled successfully' : 'Failed to cancel sale'
+        ]);
+    }
+
+    /**
  * Invoice lookup
  */
 public function invoiceLookup(): void
