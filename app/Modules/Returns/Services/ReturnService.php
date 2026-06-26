@@ -76,16 +76,29 @@ class ReturnService
         }
 
         $safeRestock =
-            $item['restock'];
+            $item['restock'] ?? false;
 
         /**
-         * Pharma restrictions
+         * Pharma restrictions - check product properties
+         * These columns may not exist in the products table,
+         * so we default to allowing restock if the property is missing
          */
-        if (
-            !$sold['allow_customer_restock']
-            || $sold['is_temperature_sensitive']
-            || $sold['is_prescription_only']
-        ) {
+        $productStmt = $this->db->prepare(
+            "SELECT is_temperature_sensitive, requires_prescription 
+             FROM products WHERE id = ? LIMIT 1"
+        );
+        $productStmt->execute([$item['product_id']]);
+        $product = $productStmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($product) {
+            $isTemperatureSensitive = (bool) ($product['is_temperature_sensitive'] ?? false);
+            $isPrescriptionOnly = (bool) ($product['requires_prescription'] ?? false);
+        } else {
+            $isTemperatureSensitive = false;
+            $isPrescriptionOnly = false;
+        }
+
+        if ($isTemperatureSensitive || $isPrescriptionOnly) {
             $safeRestock = false;
         }
 
@@ -116,7 +129,10 @@ class ReturnService
                 'quantity' =>
                     $item['quantity'],
 
-                'unit_cost' =>
+                'purchase_price' =>
+                    $item['unit_price'],
+
+                'selling_price' =>
                     $item['unit_price']
             ]);
         }
