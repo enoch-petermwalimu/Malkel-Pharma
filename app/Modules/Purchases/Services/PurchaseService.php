@@ -152,11 +152,17 @@ class PurchaseService
                             'supplier' =>
                                 null,
 
+                            'supplier_id' =>
+                                $data['supplier_id'] ?? null,
+
                             'purchase_price' =>
                                 $item['unit_cost'],
 
                             'selling_price' =>
-                                0
+                                0,
+
+                            'minimum_stock_level' =>
+                                $item['minimum_stock_level'] ?? 5
                         ]);
 
                 if (!$received) {

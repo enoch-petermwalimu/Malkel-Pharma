@@ -204,13 +204,19 @@ class InventoryService
             $batchId =
                 (int) $this->db->lastInsertId();
 
+            // Update product prices and minimum stock level if not set
             $updateProduct =
                 $this->db->prepare(
                     "
                     UPDATE products
                     SET
                         purchase_price = :purchase_price,
-                        selling_price = :selling_price
+                        selling_price = :selling_price,
+                        minimum_stock_level = CASE
+                            WHEN minimum_stock_level IS NULL OR minimum_stock_level = 0
+                            THEN :default_minimum
+                            ELSE minimum_stock_level
+                        END
                     WHERE id = :product_id
                     "
                 );
@@ -223,9 +229,29 @@ class InventoryService
                 'selling_price' =>
                     $data['selling_price'],
 
+                'default_minimum' =>
+                    $data['minimum_stock_level'] ?? 5,
+
                 'product_id' =>
                     $data['product_id']
             ]);
+
+            // Update supplier purchase count if supplier is provided
+            if (!empty($data['supplier_id'])) {
+                $updateSupplier = $this->db->prepare(
+                    "
+                    UPDATE suppliers
+                    SET 
+                        total_purchases = COALESCE(total_purchases, 0) + 1,
+                        last_purchase_date = NOW()
+                    WHERE id = :supplier_id
+                    "
+                );
+                $updateSupplier->execute([
+                    'supplier_id' => $data['supplier_id']
+                ]);
+            }
+
             $this->createMovement([
                 'product_id' => $data['product_id'],
                 'batch_id'   => $batchId,
