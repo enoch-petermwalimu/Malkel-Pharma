@@ -15,8 +15,9 @@
     </div>
 
     <a
-        href="/customers/create"
+        href="#"
         class="btn-primary"
+        onclick="alert('Customer creation is handled during POS checkout')"
     >
         Add Customer
     </a>
@@ -103,15 +104,17 @@
             <div class="customer-actions">
 
                 <a
-                href="/customers/show?id=<?= $customer['id'] ?>"
+                href="#"
                 class="btn-secondary"
+                onclick="alert('Customer profile view coming soon')"
                 >
                     Profile
                 </a>
 
                 <a
-                href="/customers/edit?id=<?= $customer['id'] ?>"
+                href="#"
                 class="btn-primary"
+                onclick="alert('Customer edit coming soon')"
                 >
                     Edit
                 </a>

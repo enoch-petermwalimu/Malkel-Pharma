@@ -21,17 +21,17 @@
     <div class="hero-actions">
 
         <a
-            href="/sales/pdf?id=<?= $sale['id'] ?>"
-            target="_blank"
+            href="#"
             class="btn-primary"
+            onclick="alert('PDF generation coming soon')"
         >
             PDF Invoice
         </a>
 
         <a
-            href="/sales/receipt?id=<?= $sale['id'] ?>"
-            target="_blank"
+            href="#"
             class="btn-secondary"
+            onclick="alert('Receipt printing coming soon')"
         >
             Receipt
         </a>
