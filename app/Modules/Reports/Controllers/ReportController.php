@@ -8,7 +8,7 @@ class ReportController extends Controller
 {
     public function index(): void
     {
-        $this->view('reports.index');
+        $this->view('reports.index', ['pageTitle' => 'Reports']);
     }
 
     public function sales(): void
