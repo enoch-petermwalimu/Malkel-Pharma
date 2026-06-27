@@ -36,20 +36,21 @@
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <h1 class="h3 mb-0">Users</h1>
-        <a href="#" class="btn btn-primary">
+        <a href="/users/create" class="btn btn-primary">
             <i class="fas fa-plus"></i> Add User
         </a>
     </div>
 
     <!-- Search box -->
-    <div class="row mb-3">
+    <form method="GET" action="/users" class="row mb-3">
         <div class="col-md-6 col-lg-4">
             <div class="input-group search-box">
                 <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" placeholder="Search users..." aria-label="Search">
+                <input type="text" name="search" class="form-control" placeholder="Search users..." aria-label="Search" value="<?= htmlspecialchars($search ?? '') ?>">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
             </div>
         </div>
-    </div>
+    </form>
 
     <!-- Responsive table wrapper -->
     <div class="table-responsive">
@@ -68,114 +69,84 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Sample row 1 -->
+                <?php if (empty($users)): ?>
+                <tr>
+                    <td colspan="9" class="text-center text-muted">No users found.</td>
+                </tr>
+                <?php else: ?>
+                <?php foreach ($users as $user): ?>
                 <tr>
                     <td>
-                        <img src="https://ui-avatars.com/api/?name=John+Doe&background=0D6EFD&color=fff&size=40"
-                             alt="John Doe"
+                        <?php if ($user->photo): ?>
+                        <img src="<?= htmlspecialchars($user->photo) ?>"
+                             alt="<?= htmlspecialchars($user->full_name) ?>"
                              class="user-photo"
                              loading="lazy">
+                        <?php else: ?>
+                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($user->full_name) ?>&background=0D6EFD&color=fff&size=40"
+                             alt="<?= htmlspecialchars($user->full_name) ?>"
+                             class="user-photo"
+                             loading="lazy">
+                        <?php endif; ?>
                     </td>
-                    <td>John Doe</td>
-                    <td>johndoe</td>
-                    <td>john@example.com</td>
-                    <td>+1 555-0100</td>
-                    <td>Admin</td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td>2026-06-27 10:30 AM</td>
+                    <td><?= htmlspecialchars($user->full_name) ?></td>
+                    <td><?= htmlspecialchars($user->username) ?></td>
+                    <td><?= htmlspecialchars($user->email) ?></td>
+                    <td><?= htmlspecialchars($user->phone ?? '') ?></td>
+                    <td><?= htmlspecialchars($user->role) ?></td>
+                    <td>
+                        <?php if ($user->is_active): ?>
+                        <span class="badge bg-success">Active</span>
+                        <?php else: ?>
+                        <span class="badge bg-secondary">Inactive</span>
+                        <?php endif; ?>
+                    </td>
+                    <td><?= $user->last_login ? date('Y-m-d h:i A', strtotime($user->last_login)) : 'Never' ?></td>
                     <td class="text-center table-actions">
-                        <a href="#" class="btn btn-sm btn-outline-info" title="View">
+                        <a href="/users/view/<?= $user->id ?>" class="btn btn-sm btn-outline-info" title="View">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="#" class="btn btn-sm btn-outline-warning" title="Edit">
+                        <a href="/users/edit/<?= $user->id ?>" class="btn btn-sm btn-outline-warning" title="Edit">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="#" class="btn btn-sm btn-outline-danger" title="Deactivate">
+                        <?php if ($user->is_active): ?>
+                        <a href="/users/deactivate/<?= $user->id ?>" class="btn btn-sm btn-outline-danger" title="Deactivate" onclick="return confirm('Deactivate this user?')">
                             <i class="fas fa-ban"></i>
                         </a>
-                        <a href="#" class="btn btn-sm btn-outline-danger" title="Delete">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </td>
-                </tr>
-                <!-- Sample row 2 -->
-                <tr>
-                    <td>
-                        <img src="https://ui-avatars.com/api/?name=Jane+Smith&background=198754&color=fff&size=40"
-                             alt="Jane Smith"
-                             class="user-photo"
-                             loading="lazy">
-                    </td>
-                    <td>Jane Smith</td>
-                    <td>janesmith</td>
-                    <td>jane@example.com</td>
-                    <td>+1 555-0101</td>
-                    <td>Manager</td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td>2026-06-26 08:15 AM</td>
-                    <td class="text-center table-actions">
-                        <a href="#" class="btn btn-sm btn-outline-info" title="View">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="#" class="btn btn-sm btn-outline-warning" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="#" class="btn btn-sm btn-outline-danger" title="Deactivate">
-                            <i class="fas fa-ban"></i>
-                        </a>
-                        <a href="#" class="btn btn-sm btn-outline-danger" title="Delete">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </td>
-                </tr>
-                <!-- Sample row 3 (inactive) -->
-                <tr>
-                    <td>
-                        <img src="https://ui-avatars.com/api/?name=Bob+Johnson&background=DC3545&color=fff&size=40"
-                             alt="Bob Johnson"
-                             class="user-photo"
-                             loading="lazy">
-                    </td>
-                    <td>Bob Johnson</td>
-                    <td>bjohnson</td>
-                    <td>bob@example.com</td>
-                    <td>+1 555-0102</td>
-                    <td>Staff</td>
-                    <td><span class="badge bg-secondary">Inactive</span></td>
-                    <td>2026-06-20 02:45 PM</td>
-                    <td class="text-center table-actions">
-                        <a href="#" class="btn btn-sm btn-outline-info" title="View">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="#" class="btn btn-sm btn-outline-warning" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="#" class="btn btn-sm btn-outline-success" title="Activate">
+                        <?php else: ?>
+                        <a href="/users/activate/<?= $user->id ?>" class="btn btn-sm btn-outline-success" title="Activate" onclick="return confirm('Activate this user?')">
                             <i class="fas fa-check-circle"></i>
                         </a>
-                        <a href="#" class="btn btn-sm btn-outline-danger" title="Delete">
+                        <?php endif; ?>
+                        <a href="/users/delete/<?= $user->id ?>" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Delete this user?')">
                             <i class="fas fa-trash"></i>
                         </a>
                     </td>
                 </tr>
+                <?php endforeach; ?>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
 
-    <!-- Pagination placeholder -->
+    <!-- Pagination -->
+    <?php if ($pages > 1): ?>
     <nav aria-label="Page navigation" class="pagination-placeholder">
         <ul class="pagination">
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+                <a class="page-link" href="?search=<?= urlencode($search) ?>&page=<?= $page - 1 ?>" tabindex="-1" aria-disabled="<?= $page <= 1 ? 'true' : 'false' ?>">Previous</a>
             </li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#">Next</a>
+            <?php for ($i = 1; $i <= $pages; $i++): ?>
+            <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                <a class="page-link" href="?search=<?= urlencode($search) ?>&page=<?= $i ?>"><?= $i ?></a>
+            </li>
+            <?php endfor; ?>
+            <li class="page-item <?= $page >= $pages ? 'disabled' : '' ?>">
+                <a class="page-link" href="?search=<?= urlencode($search) ?>&page=<?= $page + 1 ?>">Next</a>
             </li>
         </ul>
     </nav>
+    <?php endif; ?>
 </div>
 
 <!-- Bootstrap JS bundle (optional for toggles etc.) -->
