@@ -19,7 +19,7 @@
     </div>
 
     <a
-        href="/inventory/create-batch"
+        href="/inventory/batches/create"
         class="inventory-add-btn"
     >
 

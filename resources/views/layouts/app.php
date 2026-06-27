@@ -1,17 +1,34 @@
 <?php
 
-use App\Modules\Settings\Services\SettingsService;
+use App\Core\Database;
 
 /* =====================================================
    SETTINGS
 ===================================================== */
 
-$settingsService = new SettingsService();
 $settings = [];
 
 try {
-    $settings = $settingsService->all();
+
+    $db = Database::connect();
+
+    $stmt = $db->query(
+        "SELECT setting_key, setting_value
+         FROM settings"
+    );
+
+    foreach (
+        $stmt->fetchAll()
+        as $row
+    ) {
+
+        $settings[
+            $row['setting_key']
+        ] = $row['setting_value'];
+    }
+
 } catch (\Throwable $e) {
+
     $settings = [];
 }
 
@@ -68,8 +85,11 @@ $pageTitle
    LOGO
 ===================================================== */
 
-$logo = $settings['pharmacy_logo'] ?? '/assets/images/logo.png';
-$logoIcon = '/assets/images/logo-icon.svg';
+$logo =
+'/assets/images/logo.png';
+
+$logoIcon =
+'/assets/images/logo-icon.svg';
 ?>
 
 <!DOCTYPE html>
@@ -102,7 +122,7 @@ rel="stylesheet">
 
 <link
 rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 <link
 rel="stylesheet"
@@ -150,7 +170,7 @@ PHARMA ERP
 href="/dashboard"
 class="<?= $currentRoute === '/dashboard' ? 'active' : '' ?>"
 >
-<i class="bi bi-graph-up-arrow"></i>
+<i class="fa-solid fa-chart-line"></i>
 <span class="nav-text">Dashboard</span>
 </a>
 
@@ -158,7 +178,7 @@ class="<?= $currentRoute === '/dashboard' ? 'active' : '' ?>"
 href="/pos"
 class="<?= str_starts_with($currentRoute,'/pos') ? 'active' : '' ?>"
 >
-<i class="bi bi-cash-coin"></i>
+<i class="fa-solid fa-cash-register"></i>
 <span class="nav-text">POS</span>
 </a>
 
@@ -166,7 +186,7 @@ class="<?= str_starts_with($currentRoute,'/pos') ? 'active' : '' ?>"
 href="/sales/history"
 class="<?= str_starts_with($currentRoute,'/sales') ? 'active' : '' ?>"
 >
-<i class="bi bi-receipt"></i>
+<i class="fa-solid fa-receipt"></i>
 <span class="nav-text">Sales</span>
 </a>
 
@@ -174,7 +194,7 @@ class="<?= str_starts_with($currentRoute,'/sales') ? 'active' : '' ?>"
 href="/products"
 class="<?= str_starts_with($currentRoute,'/products') ? 'active' : '' ?>"
 >
-<i class="bi bi-capsule"></i>
+<i class="fa-solid fa-capsules"></i>
 <span class="nav-text">Products</span>
 </a>
 
@@ -182,7 +202,7 @@ class="<?= str_starts_with($currentRoute,'/products') ? 'active' : '' ?>"
 href="/customers"
 class="<?= str_starts_with($currentRoute,'/customers') ? 'active' : '' ?>"
 >
-<i class="bi bi-people"></i>
+<i class="fa-solid fa-users"></i>
 <span class="nav-text">Customers</span>
 </a>
 
@@ -190,7 +210,7 @@ class="<?= str_starts_with($currentRoute,'/customers') ? 'active' : '' ?>"
 href="/inventory"
 class="<?= str_starts_with($currentRoute,'/inventory') ? 'active' : '' ?>"
 >
-<i class="bi bi-boxes"></i>
+<i class="fa-solid fa-boxes-stacked"></i>
 <span class="nav-text">Inventory</span>
 </a>
 
@@ -198,7 +218,7 @@ class="<?= str_starts_with($currentRoute,'/inventory') ? 'active' : '' ?>"
 href="/suppliers"
 class="<?= str_starts_with($currentRoute,'/suppliers') ? 'active' : '' ?>"
 >
-<i class="bi bi-truck"></i>
+<i class="fa-solid fa-truck"></i>
 <span class="nav-text">Suppliers</span>
 </a>
 
@@ -206,7 +226,7 @@ class="<?= str_starts_with($currentRoute,'/suppliers') ? 'active' : '' ?>"
 href="/returns"
 class="<?= str_starts_with($currentRoute,'/returns') ? 'active' : '' ?>"
 >
-<i class="bi bi-arrow-counterclockwise"></i>
+<i class="fa-solid fa-rotate-left"></i>
 <span class="nav-text">Returns</span>
 </a>
 
@@ -214,27 +234,27 @@ class="<?= str_starts_with($currentRoute,'/returns') ? 'active' : '' ?>"
 href="/reports"
 class="<?= str_starts_with($currentRoute,'/reports') ? 'active' : '' ?>"
 >
-<i class="bi bi-bar-chart-line"></i>
-<span class="nav-text">Financial Reports</span>
+<i class="fa-solid fa-chart-column"></i>
+<span class="nav-text">Reports</span>
 </a>
 
 <a
 href="/settings"
 class="<?= str_starts_with($currentRoute,'/settings') ? 'active' : '' ?>"
 >
-<i class="bi bi-gear"></i>
+<i class="fa-solid fa-gear"></i>
 <span class="nav-text">Settings</span>
 </a>
 
 <a 
 href="/system">
-<i class="bi bi-server"></i>
+<i class="fas fa-server"></i>
     Système
 </a>
 
 <a href="/logout">
 
-<i class="bi bi-box-arrow-right"></i>
+<i class="fa-solid fa-right-from-bracket"></i>
 
 <span class="nav-text">
 Logout
@@ -256,7 +276,7 @@ id="main">
 class="btn-secondary"
 id="menuToggle">
 
-<i class="bi bi-list"></i>
+<i class="fa-solid fa-bars"></i>
 
 </button>
 

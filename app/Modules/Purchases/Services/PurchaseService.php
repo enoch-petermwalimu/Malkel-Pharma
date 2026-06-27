@@ -34,13 +34,11 @@ class PurchaseService
      */
     public function create(
         array $data
-    ): array|false {
+    ): bool {
 
         try {
 
             $this->db->beginTransaction();
-
-            $purchaseNumber = $this->repository->generatePurchaseNumber();
 
             /**
              * Purchase
@@ -48,7 +46,9 @@ class PurchaseService
             $created =
                 $this->repository
                     ->createPurchase([
-                        'purchase_number' => $purchaseNumber,
+                        'purchase_number' =>
+                            $this->repository
+                                ->generatePurchaseNumber(),
 
                         'supplier_id' =>
                             $data['supplier_id'],
@@ -152,17 +152,11 @@ class PurchaseService
                             'supplier' =>
                                 null,
 
-                            'supplier_id' =>
-                                $data['supplier_id'] ?? null,
-
                             'purchase_price' =>
                                 $item['unit_cost'],
 
                             'selling_price' =>
-                                0,
-
-                            'minimum_stock_level' =>
-                                $item['minimum_stock_level'] ?? 5
+                                0
                         ]);
 
                 if (!$received) {
@@ -174,10 +168,7 @@ class PurchaseService
 
             $this->db->commit();
 
-            return [
-                'purchase_id' => $purchaseId,
-                'purchase_number' => $purchaseNumber
-            ];
+            return true;
 
         } catch (Exception $e) {
 
@@ -193,108 +184,7 @@ class PurchaseService
     public function history(): array
     {
         return $this->repository
-            ->allPurchases();
-    }
-
-    /**
-     * ---------------------------------------------------------
-     * Cancel Purchase
-     * ---------------------------------------------------------
-     * Safely restores inventory consistency
-     */
-    public function cancel(int $purchaseId): bool
-    {
-        try {
-            $this->db->beginTransaction();
-
-            // Get purchase details
-            $purchase = $this->repository->find($purchaseId);
-
-            if (!$purchase) {
-                throw new Exception('Purchase not found');
-            }
-
-            if ($purchase['order_status'] === 'cancelled') {
-                throw new Exception('Purchase already cancelled');
-            }
-
-            // Get purchase items to know which batches to remove
-            $items = $this->repository->getItems($purchaseId);
-
-            foreach ($items as $item) {
-                // Find the batch created by this purchase
-                $batchStmt = $this->db->prepare(
-                    "SELECT id, quantity FROM inventory_batches 
-                     WHERE product_id = :product_id 
-                     AND batch_number = :batch_number 
-                     AND expiry_date = :expiry_date
-                     ORDER BY id DESC LIMIT 1"
-                );
-                $batchStmt->execute([
-                    'product_id' => $item['product_id'],
-                    'batch_number' => $item['batch_number'] ?? '',
-                    'expiry_date' => $item['expiry_date'] ?? ''
-                ]);
-                $batch = $batchStmt->fetch(PDO::FETCH_ASSOC);
-
-                if ($batch) {
-                    // Only cancel if the batch hasn't been partially consumed
-                    // If quantity is less than the original purchase quantity, 
-                    // some stock has already been sold
-                    $originalQty = (int) $item['quantity'];
-                    $currentQty = (int) $batch['quantity'];
-
-                    if ($currentQty < $originalQty) {
-                        throw new Exception(
-                            'Cannot cancel purchase: batch #' . $batch['id'] . 
-                            ' has been partially consumed (' . $currentQty . 
-                            ' remaining of ' . $originalQty . ')'
-                        );
-                    }
-
-                    // Create reversal movement log
-                    $this->inventory->createMovement([
-                        'product_id' => $item['product_id'],
-                        'batch_id' => $batch['id'],
-                        'movement_type' => 'purchase_cancellation',
-                        'quantity' => $currentQty,
-                        'notes' => 'Purchase cancelled #' . $purchase['purchase_number']
-                    ]);
-
-                    // Delete the batch
-                    $deleteStmt = $this->db->prepare(
-                        "DELETE FROM inventory_batches WHERE id = :id"
-                    );
-                    $deleteStmt->execute(['id' => $batch['id']]);
-                }
-            }
-
-            // Decrement supplier purchase stats
-            if (!empty($purchase['supplier_id'])) {
-                $updateSupplier = $this->db->prepare(
-                    "UPDATE suppliers 
-                     SET total_purchases = GREATEST(COALESCE(total_purchases, 1) - 1, 0)
-                     WHERE id = :supplier_id"
-                );
-                $updateSupplier->execute([
-                    'supplier_id' => $purchase['supplier_id']
-                ]);
-            }
-
-            // Mark purchase as cancelled
-            $updatePurchase = $this->db->prepare(
-                "UPDATE purchases SET order_status = 'cancelled', payment_status = 'cancelled' WHERE id = :id"
-            );
-            $updatePurchase->execute(['id' => $purchaseId]);
-
-            $this->db->commit();
-
-            return true;
-
-        } catch (Exception $e) {
-            $this->db->rollBack();
-            return false;
-        }
+            ->history();
     }
 
 }

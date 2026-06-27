@@ -117,26 +117,26 @@ class PurchaseRepository extends BaseRepository
         );
     }
 
-    /**
-     * Get purchase items
-     */
-    public function getItems(int $purchaseId): array
-    {
-        $statement = $this->db->prepare(
+/**
+ * Historique achats
+ */
+public function history(): array
+{
+    $statement =
+        $this->db->query(
             "
-            SELECT *
-            FROM purchase_items
-            WHERE purchase_id = :purchase_id
+            SELECT
+                p.*,
+                s.company_name
+            FROM purchases p
+            LEFT JOIN suppliers s
+                ON s.id = p.supplier_id
+            ORDER BY p.id DESC
             "
         );
 
-        $statement->execute([
-            'purchase_id' => $purchaseId
-        ]);
-
-        return $statement->fetchAll(
-            PDO::FETCH_ASSOC
-        );
-    }
-
+    return $statement->fetchAll(
+        PDO::FETCH_ASSOC
+    );
+}    
 }

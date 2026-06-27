@@ -97,8 +97,6 @@ class InventoryController extends Controller
 
     public function createBatchView(): void
     {
-        $this->requirePharmacist();
-
         $this->view(
             'inventory.create-batch'
         );
@@ -138,59 +136,31 @@ class InventoryController extends Controller
 
             $data = $request->body();
 
-            $batchId = (int) ($data['id'] ?? 0);
-
-            if ($batchId <= 0) {
-                $this->redirect('/inventory');
-                return;
-            }
-
-            $batchModel =
+            $batch =
                 new \App\Modules\Inventory\Models\InventoryBatch();
 
-            // Check if batch exists
-            $existing = $batchModel->find($batchId);
-
-            if (!$existing) {
-                $this->redirect('/inventory');
-                return;
-            }
-
-            $updated = $batchModel->update(
-                $batchId,
+            $batch->update(
+                (int) $data['id'],
                 [
                     'batch_number' =>
-                        $data['batch_number'] ?? $existing['batch_number'],
+                        $data['batch_number'],
 
                     'expiry_date' =>
-                        $data['expiry_date'] ?? $existing['expiry_date'],
+                        $data['expiry_date'],
 
                     'quantity' =>
-                        $data['quantity'] ?? $existing['quantity'],
+                        $data['quantity'],
 
                     'supplier' =>
-                        $data['supplier'] ?? $existing['supplier'],
+                        $data['supplier'],
 
                     'purchase_price' =>
-                        $data['purchase_price'] ?? $existing['purchase_price'],
+                        $data['purchase_price'],
 
                     'selling_price' =>
-                        $data['selling_price'] ?? $existing['selling_price']
+                        $data['selling_price']
                 ]
             );
-
-            if (!$updated) {
-                // Log error or handle failure
-            }
-
-            // Create movement log for the update
-            $this->service->createMovement([
-                'product_id' => $existing['product_id'],
-                'batch_id' => $batchId,
-                'movement_type' => 'batch_update',
-                'quantity' => 0,
-                'notes' => 'Batch details updated'
-            ]);
 
             $this->redirect('/inventory');
         }

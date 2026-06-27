@@ -2,13 +2,9 @@
 
 namespace App\Modules\Returns\Services;
 
-use App\Core\Database;
 use App\Modules\Returns\Models\ReturnModel;
 use App\Modules\Returns\Models\ReturnItem;
-use App\Modules\Returns\Repositories\ReturnRepository;
 use App\Modules\Inventory\Services\InventoryService;
-use PDO;
-use Exception;
 
 /**
  * ============================================================
@@ -19,108 +15,13 @@ class ReturnService
 {
     protected ReturnModel $returnModel;
     protected ReturnItem $itemModel;
-    protected ReturnRepository $repository;
     protected InventoryService $inventory;
-    protected PDO $db;
 
     public function __construct()
     {
         $this->returnModel = new ReturnModel();
         $this->itemModel = new ReturnItem();
-        $this->repository = new ReturnRepository();
         $this->inventory = new InventoryService();
-        $this->db = Database::connect();
-    }
-
-    /**
-     * Create a return
-     */
-    public function create(array $data): array|false
-    {
-        try {
-            $this->db->beginTransaction();
-
-            $returnNumber = $this->repository->generateReturnNumber();
-
-            $totalRefund = 0;
-            foreach ($data['items'] as $item) {
-                $totalRefund += $item['quantity'] * $item['unit_price'];
-            }
-
-            $created = $this->repository->createReturn([
-                'return_number' => $returnNumber,
-                'sale_id' => $data['sale_id'] ?? null,
-                'customer_id' => $data['customer_id'] ?? null,
-                'user_id' => $_SESSION['user']['id'] ?? null,
-                'reason' => $data['reason'] ?? null,
-                'total_refund' => $totalRefund,
-                'status' => 'completed'
-            ]);
-
-            if (!$created) {
-                throw new Exception('Failed to create return');
-            }
-
-            $returnId = (int) $this->db->lastInsertId();
-
-            foreach ($data['items'] as $item) {
-                $this->repository->createItem([
-                    'return_id' => $returnId,
-                    'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['unit_price'],
-                    'total_refund' => $item['quantity'] * $item['unit_price'],
-                    'reason' => $item['reason'] ?? null
-                ]);
-
-                // Restore inventory
-                $this->inventory->receiveStock([
-                    'product_id' => $item['product_id'],
-                    'batch_number' => 'RET-' . $returnNumber,
-                    'expiry_date' => date('Y-m-d', strtotime('+5 years')),
-                    'quantity' => $item['quantity'],
-                    'supplier' => null,
-                    'purchase_price' => 0,
-                    'selling_price' => $item['unit_price'],
-                    'minimum_stock_level' => 0
-                ]);
-            }
-
-            $this->db->commit();
-
-            return [
-                'return_id' => $returnId,
-                'return_number' => $returnNumber
-            ];
-
-        } catch (Exception $e) {
-            $this->db->rollBack();
-            return false;
-        }
-    }
-
-    /**
-     * All returns
-     */
-    public function all(): array
-    {
-        return $this->repository->allReturns();
-    }
-
-    /**
-     * Find return
-     */
-    public function find(int $id): array|false
-    {
-        return $this->repository->findReturn($id);
-    }
-
-    /**
-     * Get return items
-     */
-    public function items(int $returnId): array
-    {
-        return $this->repository->getItems($returnId);
     }
 
     /**
@@ -142,19 +43,18 @@ class ReturnService
         $soldMap[$sold['product_id']] = $sold;
     }
 
-    // Reuse the create method for the return record
-    $result = $this->create([
-        'sale_id' => $data['sale_id'],
+    $this->returnModel->create([
+        'return_type' => 'customer_return',
+        'reference_type' => 'sale',
+        'reference_id' => $data['sale_id'],
         'customer_id' => $data['customer_id'],
-        'reason' => $data['reason'],
-        'items' => []
+        'total_amount' => $data['total_amount'],
+        'refund_type' => $data['refund_type'],
+        'reason' => $data['reason']
     ]);
 
-    if (!$result) {
-        return false;
-    }
-
-    $returnId = $result['return_id'];
+    $returnId =
+        (int) $this->returnModel->lastInsertId();
 
     foreach ($data['items'] as $item) {
 
@@ -176,27 +76,16 @@ class ReturnService
         }
 
         $safeRestock =
-            $item['restock'] ?? false;
+            $item['restock'];
 
         /**
-         * Pharma restrictions - check product properties
+         * Pharma restrictions
          */
-        $productStmt = $this->db->prepare(
-            "SELECT is_temperature_sensitive, requires_prescription 
-             FROM products WHERE id = ? LIMIT 1"
-        );
-        $productStmt->execute([$item['product_id']]);
-        $product = $productStmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($product) {
-            $isTemperatureSensitive = (bool) ($product['is_temperature_sensitive'] ?? false);
-            $isPrescriptionOnly = (bool) ($product['requires_prescription'] ?? false);
-        } else {
-            $isTemperatureSensitive = false;
-            $isPrescriptionOnly = false;
-        }
-
-        if ($isTemperatureSensitive || $isPrescriptionOnly) {
+        if (
+            !$sold['allow_customer_restock']
+            || $sold['is_temperature_sensitive']
+            || $sold['is_prescription_only']
+        ) {
             $safeRestock = false;
         }
 
@@ -227,10 +116,7 @@ class ReturnService
                 'quantity' =>
                     $item['quantity'],
 
-                'purchase_price' =>
-                    $item['unit_price'],
-
-                'selling_price' =>
+                'unit_cost' =>
                     $item['unit_price']
             ]);
         }
@@ -278,4 +164,4 @@ class ReturnService
 
         return true;
     }
-}
+} 

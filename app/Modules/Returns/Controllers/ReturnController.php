@@ -18,81 +18,6 @@ class ReturnController extends Controller
         $this->service = new ReturnService();
     }
 
-    /**
-     * Returns list
-     */
-    public function index(): void
-    {
-        $returns = $this->service->all();
-
-        $this->view('returns.index', [
-            'returns' => $returns
-        ]);
-    }
-
-    /**
-     * Create return form
-     */
-    public function create(): void
-    {
-        $this->requirePharmacist();
-
-        $this->view('returns.create');
-    }
-
-    /**
-     * Store return
-     */
-    public function store(): void
-    {
-        $request = new Request();
-
-        $data = $request->body();
-
-        $result = $this->service->create($data);
-
-        if (!$result) {
-            $this->json([
-                'success' => false,
-                'message' => 'Return creation failed'
-            ], 500);
-            return;
-        }
-
-        $this->json([
-            'success' => true,
-            'return_id' => $result['return_id'],
-            'return_number' => $result['return_number']
-        ]);
-    }
-
-    /**
-     * Show return detail
-     */
-    public function show(): void
-    {
-        $id = (int) ($_GET['id'] ?? 0);
-
-        if ($id <= 0) {
-            $this->redirect('/returns');
-            return;
-        }
-
-        $return = $this->service->find($id);
-
-        if (!$return) {
-            $this->redirect('/returns');
-            return;
-        }
-
-        $items = $this->service->items($id);
-
-        $this->view('returns.show', [
-            'return' => $return,
-            'items' => $items
-        ]);
-    }
-
     public function customer(): void
     {
         $request = new Request();
@@ -105,14 +30,6 @@ class ReturnController extends Controller
         $this->json([
             'success' => $success
         ]);
-    }
-
-    /**
-     * Supplier return view
-     */
-    public function supplierView(): void
-    {
-        $this->view('returns.supplier');
     }
 
     public function supplier(): void

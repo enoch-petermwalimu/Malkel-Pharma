@@ -21,10 +21,7 @@ class SaleRepository extends BaseRepository
      */
     public function generateInvoiceNumber(): string
     {
-        $settingsService = new \App\Modules\Settings\Services\SettingsService();
-        $prefix = $settingsService->invoicePrefix();
-
-        return $prefix
+        return 'INV-'
             . date('Ymd')
             . '-'
             . rand(1000, 9999);
@@ -146,7 +143,10 @@ public function saleItems(
         "
         SELECT
             si.*,
-            p.name as product_name
+            p.name as product_name,
+            p.allow_customer_restock,
+            p.is_temperature_sensitive,
+            p.is_prescription_only
         FROM sale_items si
         JOIN products p
             ON p.id = si.product_id
@@ -194,11 +194,8 @@ public function saleItems(
                 LEFT JOIN users u
                     ON u.id = s.user_id
 
-                LEFT JOIN (
-                    SELECT sale_id, payment_method, amount
-                    FROM sale_payments
-                    GROUP BY sale_id
-                ) sp ON sp.sale_id = s.id
+                LEFT JOIN sale_payments sp
+                    ON sp.sale_id = s.id
 
                 WHERE s.id = :id
 
@@ -216,6 +213,28 @@ public function saleItems(
     }
 
 
+public function saleDetails(
+    int $saleId
+): array {
+
+    $statement = $this->db->prepare(
+        "
+        SELECT
+            si.*,
+            p.name
+        FROM sale_items si
+        JOIN products p
+            ON p.id = si.product_id
+        WHERE si.sale_id = :sale_id
+        "
+    );
+
+    $statement->execute([
+        'sale_id' => $saleId
+    ]);
+
+    return $statement->fetchAll(PDO::FETCH_ASSOC);
+}
 
 
     public function revenueLast3Days(): float
@@ -306,9 +325,9 @@ public function revenueDays(int $days): float
     return (float)($result['revenue'] ?? 0);
 }
 
-    public function latestSales(int $limit = 100): array
+    public function latestSales(): array
     {
-        $statement = $this->db->prepare(
+        $statement = $this->db->query(
             "
             SELECT
                 s.*,
@@ -317,113 +336,11 @@ public function revenueDays(int $days): float
             LEFT JOIN customers c
                 ON c.id = s.customer_id
             ORDER BY s.created_at DESC
-            LIMIT :limit
+            LIMIT 100
             "
         );
 
-        $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $statement->execute();
-
         return $statement->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Create sale record
-     */
-    public function create(array $data): bool
-    {
-        $statement = $this->db->prepare("
-            INSERT INTO sales (
-                invoice_number,
-                customer_id,
-                user_id,
-                subtotal,
-                discount,
-                vat,
-                total,
-                payment_method,
-                amount_received,
-                status
-            ) VALUES (
-                :invoice_number,
-                :customer_id,
-                :user_id,
-                :subtotal,
-                :discount,
-                :vat,
-                :total,
-                :payment_method,
-                :amount_received,
-                :status
-            )
-        ");
-
-        return $statement->execute([
-            'invoice_number' => $data['invoice_number'],
-            'customer_id' => $data['customer_id'],
-            'user_id' => $data['user_id'],
-            'subtotal' => $data['subtotal'],
-            'discount' => $data['discount'],
-            'vat' => $data['vat'],
-            'total' => $data['total'],
-            'payment_method' => $data['payment_method'],
-            'amount_received' => $data['amount_received'],
-            'status' => $data['status']
-        ]);
-    }
-
-    /**
-     * Create sale item
-     */
-    public function createItem(array $data): bool
-    {
-        $statement = $this->db->prepare("
-            INSERT INTO sale_items (
-                sale_id,
-                product_id,
-                quantity,
-                unit_price,
-                total_price
-            ) VALUES (
-                :sale_id,
-                :product_id,
-                :quantity,
-                :unit_price,
-                :total_price
-            )
-        ");
-
-        return $statement->execute([
-            'sale_id' => $data['sale_id'],
-            'product_id' => $data['product_id'],
-            'quantity' => $data['quantity'],
-            'unit_price' => $data['unit_price'],
-            'total_price' => $data['total_price']
-        ]);
-    }
-
-    /**
-     * Create payment record
-     */
-    public function createPayment(array $data): bool
-    {
-        $statement = $this->db->prepare("
-            INSERT INTO sale_payments (
-                sale_id,
-                payment_method,
-                amount
-            ) VALUES (
-                :sale_id,
-                :payment_method,
-                :amount
-            )
-        ");
-
-        return $statement->execute([
-            'sale_id' => $data['sale_id'],
-            'payment_method' => $data['payment_method'],
-            'amount' => $data['amount']
-        ]);
     }
 
     public function history(): array
@@ -443,26 +360,5 @@ public function revenueDays(int $days): float
         return $statement->fetchAll(
             PDO::FETCH_ASSOC
         );
-    }
-
-    /**
-     * Get daily sales for the last 7 days
-     */
-    public function dailySalesLast7Days(): array
-    {
-        $statement = $this->db->query(
-            "
-            SELECT
-                DATE(created_at) as date,
-                SUM(total) as revenue,
-                COUNT(*) as count
-            FROM sales
-            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-            GROUP BY DATE(created_at)
-            ORDER BY DATE(created_at) ASC
-            "
-        );
-
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 }

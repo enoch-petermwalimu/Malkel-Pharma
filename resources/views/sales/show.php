@@ -21,17 +21,17 @@
     <div class="hero-actions">
 
         <a
-            href="#"
+            href="/sales/pdf?id=<?= $sale['id'] ?>"
+            target="_blank"
             class="btn-primary"
-            onclick="alert('PDF generation coming soon')"
         >
             PDF Invoice
         </a>
 
         <a
-            href="#"
+            href="/sales/receipt?id=<?= $sale['id'] ?>"
+            target="_blank"
             class="btn-secondary"
-            onclick="alert('Receipt printing coming soon')"
         >
             Receipt
         </a>
@@ -272,9 +272,7 @@
                     <td>
 
                         <?= htmlspecialchars(
-                            $item['product_name']
-                            ?? $item['name']
-                            ?? '-'
+                            $item['name']
                         ) ?>
 
                     </td>

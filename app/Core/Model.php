@@ -111,12 +111,4 @@ abstract class Model
             'id' => $id
         ]);
     }
-
-    /**
-     * Get last inserted ID
-     */
-    public function lastInsertId(): string|false
-    {
-        return $this->db->lastInsertId();
-    }
 }

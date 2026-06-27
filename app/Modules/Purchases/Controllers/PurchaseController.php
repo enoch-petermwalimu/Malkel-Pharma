@@ -24,19 +24,7 @@ class PurchaseController extends Controller
      */
     public function index(): void
     {
-        $purchases = $this->service->history();
-
-        $this->view('purchases.index', [
-            'purchases' => $purchases
-        ]);
-    }
-
-    /**
-     * Create form
-     */
-    public function create(): void
-    {
-        $this->view('purchases.create');
+        $this->view('purchases.index');
     }
 
     /**
@@ -48,50 +36,11 @@ class PurchaseController extends Controller
 
         $data = $request->body();
 
-        $result = $this->service->create($data);
-
-        if (!$result) {
-            $this->json([
-                'success' => false,
-                'message' => 'Purchase creation failed'
-            ], 500);
-            return;
-        }
+        $success =
+            $this->service->create($data);
 
         $this->json([
-            'success' => true,
-            'purchase_id' => $result['purchase_id'],
-            'purchase_number' => $result['purchase_number']
+            'success' => $success
         ]);
     }
-
-    /**
-     * Cancel purchase
-     */
-    public function cancel(): void
-    {
-        $this->requireAdmin();
-
-        $request = new Request();
-
-        $data = $request->body();
-
-        $purchaseId = (int) ($data['id'] ?? 0);
-
-        if ($purchaseId <= 0) {
-            $this->json([
-                'success' => false,
-                'message' => 'Invalid purchase ID'
-            ], 400);
-            return;
-        }
-
-        $success = $this->service->cancel($purchaseId);
-
-        $this->json([
-            'success' => $success,
-            'message' => $success ? 'Purchase cancelled successfully' : 'Failed to cancel purchase'
-        ]);
-    }
-
 }

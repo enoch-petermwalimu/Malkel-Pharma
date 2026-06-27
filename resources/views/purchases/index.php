@@ -9,44 +9,149 @@
         </h2>
 
         <p class="text-slate-400">
-            Historique des achats et réceptions fournisseurs
+            Réception des marchandises fournisseurs
         </p>
 
     </div>
 
     <a
-        href="/purchases/create"
-        class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold"
+        href="/purchases/history"
+        class="px-4 py-2 bg-slate-700 rounded-xl"
     >
-        Nouvel Achat
+        Historique
     </a>
 
 </div>
 
-<?php if (empty($purchases ?? [])): ?>
+<!-- FOURNISSEUR -->
 
-<div class="glass rounded-3xl p-12 text-center">
+<div class="glass rounded-3xl p-6 mb-6">
 
-    <i class="bi bi-truck text-5xl text-slate-500 mb-4"></i>
-
-    <h3 class="text-xl font-bold mb-2">
-        Aucun achat enregistré
+    <h3 class="font-bold mb-4">
+        Fournisseur
     </h3>
 
-    <p class="text-slate-400 mb-6">
-        Commencez par créer votre premier bon de commande.
-    </p>
-
-    <a
-        href="/purchases/create"
-        class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold"
+    <input
+        type="text"
+        id="supplier-search"
+        placeholder="Rechercher un fournisseur..."
+        class="w-full p-3 rounded-xl bg-slate-800"
     >
-        Créer un achat
-    </a>
+
+    <input
+        type="hidden"
+        id="supplier_id"
+    >
+
+    <div
+        id="supplier-results"
+        class="mt-3"
+    ></div>
 
 </div>
 
-<?php else: ?>
+<!-- AJOUT PRODUIT -->
+
+<div class="glass rounded-3xl p-6 mb-6">
+
+    <h3 class="font-bold mb-4">
+        Ajouter un produit
+    </h3>
+
+    <div class="grid grid-cols-5 gap-4">
+
+        <div>
+
+            <label>
+                Produit
+            </label>
+
+            <input
+                type="text"
+                id="product-search"
+                class="w-full p-3 rounded-xl bg-slate-800"
+            >
+
+            <input
+                type="hidden"
+                id="product_id"
+            >
+
+            <div
+                id="product-results"
+            ></div>
+
+        </div>
+
+        <div>
+
+            <label>
+                Quantité
+            </label>
+
+            <input
+                type="number"
+                id="quantity"
+                class="w-full p-3 rounded-xl bg-slate-800"
+            >
+
+        </div>
+
+        <div>
+
+            <label>
+                Prix Achat
+            </label>
+
+            <input
+                type="number"
+                step="0.01"
+                id="unit_cost"
+                class="w-full p-3 rounded-xl bg-slate-800"
+            >
+
+        </div>
+
+        <div>
+
+            <label>
+                Expiration
+            </label>
+
+            <input
+                type="date"
+                id="expiry_date"
+                class="w-full p-3 rounded-xl bg-slate-800"
+            >
+
+        </div>
+
+        <div>
+
+            <label>
+                Lot
+            </label>
+
+            <input
+                type="text"
+                id="batch_number"
+                class="w-full p-3 rounded-xl bg-slate-800"
+            >
+
+        </div>
+
+    </div>
+
+    <button
+        id="add-product-btn"
+        class="mt-4 px-4 py-2 bg-blue-600 rounded-xl"
+    >
+        Ajouter
+    </button>
+
+</div>
+
+<!-- TABLEAU -->
 
 <div class="glass rounded-3xl overflow-hidden">
 
@@ -57,11 +162,15 @@
             <tr>
 
                 <th class="p-4 text-left">
-                    N° Commande
+                    Produit
                 </th>
 
                 <th class="p-4 text-left">
-                    Fournisseur
+                    Qté
+                </th>
+
+                <th class="p-4 text-left">
+                    Prix Achat
                 </th>
 
                 <th class="p-4 text-left">
@@ -69,11 +178,11 @@
                 </th>
 
                 <th class="p-4 text-left">
-                    Statut
+                    Lot
                 </th>
 
                 <th class="p-4 text-left">
-                    Date
+                    Expiration
                 </th>
 
                 <th class="p-4 text-left">
@@ -84,106 +193,18 @@
 
         </thead>
 
-        <tbody>
+        <tbody id="purchase-items">
 
-            <?php foreach ($purchases as $purchase): ?>
+            <tr>
 
-                <tr class="border-t border-slate-800">
+                <td
+                    colspan="7"
+                    class="p-6 text-center text-slate-400"
+                >
+                    Aucun produit ajouté
+                </td>
 
-                    <td class="p-4">
-
-                        <strong>
-                            <?= htmlspecialchars(
-                                $purchase['purchase_number']
-                                ?? '-'
-                            ) ?>
-                        </strong>
-
-                    </td>
-
-                    <td class="p-4">
-
-                        <?= htmlspecialchars(
-                            $purchase['company_name']
-                            ?? '-'
-                        ) ?>
-
-                    </td>
-
-                    <td class="p-4">
-
-                        $
-
-                        <?= number_format(
-                            (float) ($purchase['total'] ?? 0),
-                            2
-                        ) ?>
-
-                    </td>
-
-                    <td class="p-4">
-
-                        <?php
-                        $status =
-                            $purchase['payment_status']
-                            ?? 'pending';
-                        ?>
-
-                        <?php if ($status === 'paid'): ?>
-
-                            <span class="text-green-500">
-                                Payé
-                            </span>
-
-                        <?php elseif ($status === 'pending'): ?>
-
-                            <span class="text-yellow-500">
-                                En attente
-                            </span>
-
-                        <?php else: ?>
-
-                            <span class="text-red-500">
-                                <?= htmlspecialchars($status) ?>
-                            </span>
-
-                        <?php endif; ?>
-
-                    </td>
-
-                    <td class="p-4">
-
-                        <?= htmlspecialchars(
-                            $purchase['created_at']
-                            ?? '-'
-                        ) ?>
-
-                    </td>
-
-                    <td class="p-4">
-
-                        <?php if (($purchase['order_status'] ?? '') !== 'cancelled'): ?>
-
-                            <button
-                                onclick="cancelPurchase(<?= $purchase['id'] ?>)"
-                                class="text-red-500 hover:text-red-400"
-                            >
-                                Annuler
-                            </button>
-
-                        <?php else: ?>
-
-                            <span class="text-slate-500">
-                                Annulé
-                            </span>
-
-                        <?php endif; ?>
-
-                    </td>
-
-                </tr>
-
-            <?php endforeach; ?>
+            </tr>
 
         </tbody>
 
@@ -191,36 +212,34 @@
 
 </div>
 
-<?php endif; ?>
+<!-- TOTAL -->
 
-<script>
+<div class="mt-6 text-right">
 
-async function cancelPurchase(id) {
-    if (!confirm('Êtes-vous sûr de vouloir annuler cet achat ? Cette action est irréversible.')) {
-        return;
-    }
+    <h2 class="text-2xl font-bold">
 
-    try {
-        const response = await fetch('/purchases/cancel', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: id })
-        });
+        Total :
 
-        const data = await response.json();
+        <span id="purchase-total">
+            0.00
+        </span>
 
-        if (data.success) {
-            alert('Achat annulé avec succès');
-            location.reload();
-        } else {
-            alert('Erreur lors de l\'annulation : ' + (data.message || 'Erreur inconnue'));
-        }
-    } catch (error) {
-        alert('Erreur réseau');
-    }
-}
+    </h2>
 
-</script>
+</div>
+
+<!-- ACTION -->
+
+<div class="mt-6">
+
+    <button
+        id="save-purchase-btn"
+        class="px-6 py-3 bg-green-600 rounded-xl"
+    >
+        Valider Achat
+    </button>
+
+</div>
 
 <?php
 

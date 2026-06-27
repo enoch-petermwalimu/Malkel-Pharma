@@ -78,7 +78,7 @@ async function lookupInvoice()
 
     const response =
         await fetch(
-            `/pos/invoice-lookup?invoice=${invoice}`
+            `/sales/invoice-lookup?invoice=${invoice}`
         );
 
     const data =
@@ -223,10 +223,26 @@ function renderItems(items)
 
             <td>
 
-                <input
-                    type="checkbox"
-                    id="restock_${item.id}"
-                >
+                ${
+                    item.allow_customer_restock &&
+                    !item.is_temperature_sensitive &&
+                    !item.is_prescription_only
+
+                    ?
+
+                    `<input
+                        type="checkbox"
+                        id="restock_${item.id}"
+                    >`
+
+                    :
+
+                    `<span style="
+                        color:#ef4444;
+                    ">
+                        Forbidden
+                    </span>`
+                }
 
             </td>
 
@@ -363,7 +379,7 @@ async function submitReturn()
 
     const response =
         await fetch(
-            '/returns/store',
+            '/returns/customer',
             {
                 method:'POST',
 

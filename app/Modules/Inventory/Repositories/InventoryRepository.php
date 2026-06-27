@@ -52,34 +52,17 @@ class InventoryRepository extends BaseRepository
             SELECT
                 p.name,
                 SUM(b.quantity) as total_stock,
-                COALESCE(p.minimum_stock_level, p.minimum_stock, 0) as minimum_stock
+                p.minimum_stock
             FROM inventory_batches b
             JOIN products p
                 ON p.id = b.product_id
             GROUP BY p.id
-            HAVING total_stock <= minimum_stock
+            HAVING total_stock <= p.minimum_stock
             "
         );
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Create a batch record
-     */
-    public function create(array $data): bool
-    {
-        $columns = array_keys($data);
-        $placeholders = array_map(fn($col) => ':' . $col, $columns);
-
-        $sql = sprintf(
-            "INSERT INTO %s (%s) VALUES (%s)",
-            $this->table,
-            implode(', ', $columns),
-            implode(', ', $placeholders)
-        );
-
-        $statement = $this->db->prepare($sql);
-        return $statement->execute($data);
-    }
+    
 }

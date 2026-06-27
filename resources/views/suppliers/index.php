@@ -28,7 +28,7 @@
         onclick="openCreateModal()"
         class="btn"
     >
-        <i class="bi bi-plus-lg"></i>
+        <i class="fa-solid fa-plus"></i>
         Ajouter Fournisseur
     </button>
 
@@ -39,7 +39,7 @@
 <div class="card text-center">
 
     <i
-        class="bi bi-truck text-5xl text-slate-500 mb-4"
+        class="fa-solid fa-truck text-5xl text-slate-500 mb-4"
     ></i>
 
     <h3 class="text-xl font-bold mb-2">
@@ -54,7 +54,7 @@
         onclick="openCreateModal()"
         class="btn"
     >
-        <i class="bi bi-plus-lg"></i>
+        <i class="fa-solid fa-plus"></i>
         Ajouter Fournisseur
     </button>
 
@@ -75,7 +75,7 @@
             <h3 class="font-bold text-lg flex items-center gap-2">
 
                 <i
-                    class="bi bi-truck text-blue-500"
+                    class="fa-solid fa-truck text-blue-500"
                 ></i>
 
                 <?= htmlspecialchars(
@@ -101,7 +101,7 @@
                     <?= json_encode($supplier) ?>
                 )'
             >
-                <i class="bi bi-pencil"></i>
+                <i class="fa-solid fa-pen"></i>
                 Modifier
             </button>
 
@@ -111,7 +111,7 @@
                     <?= $supplier['id'] ?>
                 )"
             >
-                <i class="bi bi-trash"></i>
+                <i class="fa-solid fa-trash"></i>
                 Supprimer
             </button>
 
@@ -123,7 +123,7 @@
         <p class="flex items-center gap-2">
 
             <i
-                class="bi bi-telephone text-blue-400"
+                class="fa-solid fa-phone text-blue-400"
             ></i>
 
             <?= htmlspecialchars(
@@ -136,7 +136,7 @@
         <p class="flex items-center gap-2">
 
             <i
-                class="bi bi-envelope text-green-400"
+                class="fa-solid fa-envelope text-green-400"
             ></i>
 
             <?= htmlspecialchars(
@@ -149,7 +149,7 @@
         <p class="flex items-center gap-2">
 
             <i
-                class="bi bi-geo-alt text-red-400"
+                class="fa-solid fa-location-dot text-red-400"
             ></i>
 
             <?= htmlspecialchars(
@@ -178,7 +178,7 @@
 
         <h3 class="text-xl font-bold mb-4">
 
-            <i class="bi bi-plus-lg"></i>
+            <i class="fa-solid fa-plus"></i>
 
             Ajouter Fournisseur
 
@@ -266,7 +266,7 @@
 
         <h3 class="text-xl font-bold mb-4">
 
-            <i class="bi bi-pencil"></i>
+            <i class="fa-solid fa-pen"></i>
 
             Modifier Fournisseur
 
@@ -556,12 +556,12 @@ if(supplierFilter)
 
             document
             .querySelectorAll(
-                '.card'
+                '.supplier-card'
             )
             .forEach(card =>
             {
                 const name =
-                    card.innerText.toLowerCase();
+                    card.dataset.name;
 
                 card.style.display =
                     name.includes(search)

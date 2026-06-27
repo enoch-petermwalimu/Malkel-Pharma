@@ -9,41 +9,29 @@ class CreateSettingsTable extends Migration
         $this->db->exec("
             CREATE TABLE IF NOT EXISTS settings (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                setting_key VARCHAR(100) NOT NULL UNIQUE,
-                setting_value TEXT NULL,
+
+                pharmacy_name VARCHAR(255) NOT NULL,
+
+                pharmacy_logo VARCHAR(255) NULL,
+
+                phone VARCHAR(50) NULL,
+
+                email VARCHAR(255) NULL,
+
+                address TEXT NULL,
+
+                primary_currency VARCHAR(10) DEFAULT 'USD',
+
+                exchange_rate DECIMAL(12,2) DEFAULT 3000,
+
+                theme_name VARCHAR(100) DEFAULT 'medical-blue',
+
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-                INDEX idx_setting_key (setting_key)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+
+                updated_at TIMESTAMP NULL
+            )
         ");
-
-        // Insert default settings
-        $defaults = [
-            ['pharmacy_name', 'MARKEL PHARMA'],
-            ['pharmacy_logo', '/assets/images/logo.png'],
-            ['phone', ''],
-            ['email', ''],
-            ['address', ''],
-            ['primary_currency', 'USD'],
-            ['exchange_rate', '3000'],
-            ['theme_name', 'medical-blue'],
-            ['invoice_prefix', 'INV-'],
-            ['tax_rate', '0'],
-            ['vat_rate', '0'],
-            ['receipt_footer', 'Thank you for your purchase!'],
-        ];
-
-        $stmt = $this->db->prepare("
-            INSERT IGNORE INTO settings (setting_key, setting_value) VALUES (:key, :value)
-        ");
-
-        foreach ($defaults as $default) {
-            $stmt->execute(['key' => $default[0], 'value' => $default[1]]);
-        }
     }
 
-    public function down(): void
-    {
-        $this->db->exec("DROP TABLE IF EXISTS settings");
-    }
+    public function down(): void {}
 }

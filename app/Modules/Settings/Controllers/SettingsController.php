@@ -3,25 +3,32 @@
 namespace App\Modules\Settings\Controllers;
 
 use App\Core\Controller;
-use App\Modules\Settings\Services\SettingsService;
+use App\Core\Database;
 
 class SettingsController extends Controller
 {
-    protected SettingsService $settingsService;
-
-    public function __construct()
-    {
-        $this->settingsService = new SettingsService();
-    }
-
     /**
      * Afficher la page settings
      */
     public function index(): void
     {
-        $this->requireAdmin();
+        $db = Database::connect();
 
-        $settings = $this->settingsService->all();
+        $stmt = $db->query("
+            SELECT
+                setting_key,
+                setting_value
+            FROM settings
+        ");
+
+        $settings = [];
+
+        foreach ($stmt->fetchAll() as $row) {
+
+            $settings[
+                $row['setting_key']
+            ] = $row['setting_value'];
+        }
 
         require dirname(__DIR__, 4)
             . '/resources/views/settings/index.php';
@@ -32,34 +39,63 @@ class SettingsController extends Controller
      */
     public function update(): void
     {
-        $this->requireAdmin();
+        $this->saveSetting(
+            'pharmacy_name',
+            $_POST['pharmacy_name'] ?? ''
+        );
 
-        $this->settingsService->set('pharmacy_name', $_POST['pharmacy_name'] ?? '');
-        $this->settingsService->set('phone', $_POST['phone'] ?? '');
-        $this->settingsService->set('email', $_POST['email'] ?? '');
-        $this->settingsService->set('address', $_POST['address'] ?? '');
-        $this->settingsService->set('primary_currency', $_POST['primary_currency'] ?? 'USD');
-        $this->settingsService->set('exchange_rate', $_POST['exchange_rate'] ?? '3000');
-        $this->settingsService->set('theme_name', $_POST['theme_name'] ?? 'medical-blue');
-        $this->settingsService->set('invoice_prefix', $_POST['invoice_prefix'] ?? 'INV-');
-        $this->settingsService->set('tax_rate', $_POST['tax_rate'] ?? '0');
-        $this->settingsService->set('vat_rate', $_POST['vat_rate'] ?? '0');
-        $this->settingsService->set('receipt_footer', $_POST['receipt_footer'] ?? 'Thank you for your purchase!');
+        $this->saveSetting(
+            'phone',
+            $_POST['phone'] ?? ''
+        );
 
-        // Handle logo upload
+        $this->saveSetting(
+            'email',
+            $_POST['email'] ?? ''
+        );
+
+        $this->saveSetting(
+            'address',
+            $_POST['address'] ?? ''
+        );
+
+        $this->saveSetting(
+            'primary_currency',
+            $_POST['primary_currency'] ?? 'USD'
+        );
+
+        $this->saveSetting(
+            'exchange_rate',
+            $_POST['exchange_rate'] ?? '3000'
+        );
+
+        $this->saveSetting(
+            'theme_name',
+            $_POST['theme_name'] ?? 'medical-blue'
+        );
+
+        header('Location: /settings');
+        exit;
+
         if (
             isset($_FILES['pharmacy_logo'])
             &&
             $_FILES['pharmacy_logo']['error'] === 0
         ) {
+
             $extension = pathinfo(
-                $_FILES['pharmacy_logo']['name'],
-                PATHINFO_EXTENSION
+            $_FILES['pharmacy_logo']['name'],
+            PATHINFO_EXTENSION
             );
 
-            $fileName = 'logo_' . time() . '.' . $extension;
+            $fileName =
+                'logo_' .
+                time() .
+                '.' .
+                $extension;
 
-            $destination = dirname(__DIR__, 4)
+            $destination =
+                dirname(__DIR__, 4)
                 . '/public/uploads/logos/'
                 . $fileName;
 
@@ -68,13 +104,41 @@ class SettingsController extends Controller
                 $destination
             );
 
-            $this->settingsService->set(
+            $this->saveSetting(
                 'pharmacy_logo',
                 '/uploads/logos/' . $fileName
             );
         }
+    }
 
-        header('Location: /settings');
-        exit;
+    /**
+     * Insère ou met à jour un paramètre
+     */
+    private function saveSetting(
+        string $key,
+        string $value
+    ): void
+    {
+        $db = Database::connect();
+
+        $stmt = $db->prepare("
+            INSERT INTO settings
+            (
+                setting_key,
+                setting_value
+            )
+            VALUES
+            (
+                :setting_key,
+                :setting_value
+            )
+            ON DUPLICATE KEY UPDATE
+            setting_value = VALUES(setting_value)
+        ");
+
+        $stmt->execute([
+            'setting_key' => $key,
+            'setting_value' => $value
+        ]);
     }
 }

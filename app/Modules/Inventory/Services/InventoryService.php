@@ -175,19 +175,6 @@ class InventoryService
 
             $this->db->beginTransaction();
 
-            // Validate product exists
-            $productStmt = $this->db->prepare(
-                "SELECT id FROM products WHERE id = :id LIMIT 1"
-            );
-            $productStmt->execute(['id' => $data['product_id']]);
-            $product = $productStmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$product) {
-                throw new Exception(
-                    'Product not found: ' . $data['product_id']
-                );
-            }
-
             $created = $this->batchModel->create([
 
                 'product_id'     => $data['product_id'],
@@ -217,19 +204,13 @@ class InventoryService
             $batchId =
                 (int) $this->db->lastInsertId();
 
-            // Update product prices and minimum stock level if not set
             $updateProduct =
                 $this->db->prepare(
                     "
                     UPDATE products
                     SET
                         purchase_price = :purchase_price,
-                        selling_price = :selling_price,
-                        minimum_stock_level = CASE
-                            WHEN minimum_stock_level IS NULL OR minimum_stock_level = 0
-                            THEN :default_minimum
-                            ELSE minimum_stock_level
-                        END
+                        selling_price = :selling_price
                     WHERE id = :product_id
                     "
                 );
@@ -242,29 +223,9 @@ class InventoryService
                 'selling_price' =>
                     $data['selling_price'],
 
-                'default_minimum' =>
-                    $data['minimum_stock_level'] ?? 5,
-
                 'product_id' =>
                     $data['product_id']
             ]);
-
-            // Update supplier purchase count if supplier is provided
-            if (!empty($data['supplier_id'])) {
-                $updateSupplier = $this->db->prepare(
-                    "
-                    UPDATE suppliers
-                    SET 
-                        total_purchases = COALESCE(total_purchases, 0) + 1,
-                        last_purchase_date = NOW()
-                    WHERE id = :supplier_id
-                    "
-                );
-                $updateSupplier->execute([
-                    'supplier_id' => $data['supplier_id']
-                ]);
-            }
-
             $this->createMovement([
                 'product_id' => $data['product_id'],
                 'batch_id'   => $batchId,
@@ -341,21 +302,9 @@ class InventoryService
                     "
                     UPDATE inventory_batches
                     SET quantity = quantity - :qty
-                    WHERE id = :id AND quantity >= :qty
+                    WHERE id = :id
                     "
                 );
-
-                $update->execute([
-                    'qty' => $deduct,
-                    'id' => $batch['id']
-                ]);
-
-                // Verify the update affected a row (quantity was sufficient)
-                if ($update->rowCount() === 0) {
-                    throw new Exception(
-                        'Stock inconsistency detected for batch #' . $batch['id']
-                    );
-                }
 
                 /**
                  * Movement log
@@ -391,7 +340,64 @@ class InventoryService
     int $qty,
     string $reason = 'Expired stock'
 ): bool {
-    return $this->deductFromBatch($batchId, $qty, 'expired', $reason);
+
+    try {
+
+        $this->db->beginTransaction();
+
+        $statement = $this->db->prepare(
+            "
+            SELECT *
+            FROM inventory_batches
+            WHERE id = :id
+            "
+        );
+
+        $statement->execute([
+            'id' => $batchId
+        ]);
+
+        $batch = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if (!$batch) {
+            throw new Exception();
+        }
+
+        if ($batch['quantity'] < $qty) {
+            throw new Exception();
+        }
+
+        $update = $this->db->prepare(
+            "
+            UPDATE inventory_batches
+            SET quantity = quantity - :qty
+            WHERE id = :id
+            "
+        );
+
+        $update->execute([
+            'qty' => $qty,
+            'id' => $batchId
+        ]);
+
+        $this->createMovement([
+            'product_id' => $batch['product_id'],
+            'batch_id' => $batchId,
+            'movement_type' => 'expired',
+            'quantity' => $qty,
+            'notes' => $reason
+        ]);
+
+        $this->db->commit();
+
+        return true;
+
+    } catch (Exception $e) {
+
+        $this->db->rollBack();
+
+        return false;
+    }
 }
 
 public function markDamaged(
@@ -399,53 +405,62 @@ public function markDamaged(
     int $qty,
     string $reason = 'Damaged stock'
 ): bool {
-    return $this->deductFromBatch($batchId, $qty, 'damaged', $reason);
-}
 
-/**
- * Deduct from a specific batch (used by markExpired and markDamaged)
- */
-protected function deductFromBatch(
-    int $batchId,
-    int $qty,
-    string $movementType,
-    string $reason
-): bool {
     try {
+
         $this->db->beginTransaction();
 
         $statement = $this->db->prepare(
-            "SELECT * FROM inventory_batches WHERE id = :id"
+            "
+            SELECT *
+            FROM inventory_batches
+            WHERE id = :id
+            "
         );
-        $statement->execute(['id' => $batchId]);
+
+        $statement->execute([
+            'id' => $batchId
+        ]);
+
         $batch = $statement->fetch(PDO::FETCH_ASSOC);
 
         if (!$batch) {
-            throw new Exception('Batch not found');
+            throw new Exception();
         }
 
         if ($batch['quantity'] < $qty) {
-            throw new Exception('Insufficient quantity in batch');
+            throw new Exception();
         }
 
         $update = $this->db->prepare(
-            "UPDATE inventory_batches SET quantity = quantity - :qty WHERE id = :id"
+            "
+            UPDATE inventory_batches
+            SET quantity = quantity - :qty
+            WHERE id = :id
+            "
         );
-        $update->execute(['qty' => $qty, 'id' => $batchId]);
+
+        $update->execute([
+            'qty' => $qty,
+            'id' => $batchId
+        ]);
 
         $this->createMovement([
             'product_id' => $batch['product_id'],
             'batch_id' => $batchId,
-            'movement_type' => $movementType,
+            'movement_type' => 'damaged',
             'quantity' => $qty,
             'notes' => $reason
         ]);
 
         $this->db->commit();
+
         return true;
 
     } catch (Exception $e) {
+
         $this->db->rollBack();
+
         return false;
     }
 }
