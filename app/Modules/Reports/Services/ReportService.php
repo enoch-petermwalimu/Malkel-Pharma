@@ -16,10 +16,15 @@ class ReportService
      */
     public function getAllActivities(): array
     {
-        $sales = Sale::all();
-        $purchases = Purchase::all();
-        $stockMovements = StockMovement::all();
-        $returns = ReturnModel::all();
+        $saleModel = new Sale();
+        $purchaseModel = new Purchase();
+        $stockMovementModel = new StockMovement();
+        $returnModel = new ReturnModel();
+
+        $sales = $saleModel->all();
+        $purchases = $purchaseModel->all();
+        $stockMovements = $stockMovementModel->all();
+        $returns = $returnModel->all();
 
         return [
             'sales' => $sales,
