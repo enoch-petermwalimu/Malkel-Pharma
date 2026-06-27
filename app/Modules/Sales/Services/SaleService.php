@@ -265,14 +265,6 @@ if (
                     $item['quantity']
                     * $item['unit_price']
             ]);
-
-            /**
-             * Stock deduction
-             */
-            $this->inventory->deductStock(
-                (int) $item['product_id'],
-                (int) $item['quantity']
-            );
         }
 
         /**
@@ -289,6 +281,23 @@ if (
 
             'payment_status' => 'paid',
         ]);
+
+        /**
+         * Stock deduction (after sale completed)
+         */
+        foreach ($data['items'] as $item) {
+            $deducted = $this->inventory->deductStock(
+                (int) $item['product_id'],
+                (int) $item['quantity']
+            );
+
+            if (!$deducted) {
+                throw new \Exception(
+                    'Échec de la déduction du stock pour le produit ID '
+                    . $item['product_id']
+                );
+            }
+        }
 
         return [
 
