@@ -8,8 +8,9 @@ class CustomerController extends Controller
 {
     public function index(): void
     {
-        // Placeholder – route will resolve without error
-        $this->json(['message' => 'Customer module under construction']);
+        // Placeholder: fetch customers from service/repository
+        $customers = []; // TODO: implement data fetching
+        $this->view('customers.index', ['customers' => $customers]);
     }
 
     public function create(): void
