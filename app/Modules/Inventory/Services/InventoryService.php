@@ -306,6 +306,11 @@ class InventoryService
                     "
                 );
 
+                $update->execute([
+                    'qty' => $deduct,
+                    'id' => $batch['id']
+                ]);
+
                 /**
                  * Movement log
                  */
