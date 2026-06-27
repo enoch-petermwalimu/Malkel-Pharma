@@ -82,4 +82,70 @@ class SupplierRepository extends BaseRepository
                 $id
         ]);
     }
+
+    /**
+     * Disable supplier (set status = 0)
+     */
+    public function disable(int $id): bool
+    {
+        $statement = $this->db->prepare(
+            "
+            UPDATE suppliers
+            SET status = 0
+            WHERE id = :id
+            "
+        );
+
+        return $statement->execute([
+            'id' => $id
+        ]);
+    }
+
+    /**
+     * Find supplier by ID
+     */
+    public function find(int $id): ?array
+    {
+        $statement = $this->db->prepare(
+            "
+            SELECT *
+            FROM suppliers
+            WHERE id = :id
+            LIMIT 1
+            "
+        );
+
+        $statement->execute([
+            'id' => $id
+        ]);
+
+        $result = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        return $result ?: null;
+    }
+
+    /**
+     * Purchase history for a supplier
+     */
+    public function purchaseHistory(int $supplierId): array
+    {
+        $statement = $this->db->prepare(
+            "
+            SELECT
+                p.*,
+                s.company_name
+            FROM purchases p
+            LEFT JOIN suppliers s
+                ON s.id = p.supplier_id
+            WHERE p.supplier_id = :supplier_id
+            ORDER BY p.id DESC
+            "
+        );
+
+        $statement->execute([
+            'supplier_id' => $supplierId
+        ]);
+
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }

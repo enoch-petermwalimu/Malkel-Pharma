@@ -53,4 +53,28 @@ class SupplierService
         return $this->model
             ->delete($id);
     }
+
+    /**
+     * Disable supplier (set status = 0)
+     */
+    public function disable(int $id): bool
+    {
+        return $this->repository->disable($id);
+    }
+
+    /**
+     * Find supplier by ID
+     */
+    public function find(int $id): ?array
+    {
+        return $this->repository->find($id);
+    }
+
+    /**
+     * Purchase history for a supplier
+     */
+    public function purchaseHistory(int $supplierId): array
+    {
+        return $this->repository->purchaseHistory($supplierId);
+    }
 }
