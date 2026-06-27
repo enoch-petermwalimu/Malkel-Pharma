@@ -8,7 +8,7 @@ class ReportController extends Controller
 {
     public function index(): void
     {
-        echo '<h1>Reports</h1>';
+        $this->view('reports.index');
     }
 
     public function sales(): void
