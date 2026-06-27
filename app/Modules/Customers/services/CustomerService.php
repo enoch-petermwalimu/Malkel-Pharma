@@ -26,6 +26,11 @@ class CustomerService
         return $this->repository->search($query);
     }
 
+    public function getAll(): array
+    {
+        return $this->repository->all();
+    }
+
     public function create(array $data): bool
     {
         return $this->model->create($data);

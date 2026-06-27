@@ -34,4 +34,13 @@ class CustomerRepository extends BaseRepository
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Get all customers
+     */
+    public function all(): array
+    {
+        $statement = $this->db->query("SELECT * FROM customers");
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

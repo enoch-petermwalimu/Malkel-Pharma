@@ -3,13 +3,20 @@
 namespace App\Modules\Customers\Controllers;
 
 use App\Core\Controller;
+use App\Modules\Customers\Services\CustomerService;
 
 class CustomerController extends Controller
 {
+    protected CustomerService $service;
+
+    public function __construct()
+    {
+        $this->service = new CustomerService();
+    }
+
     public function index(): void
     {
-        // Placeholder: fetch customers from service/repository
-        $customers = []; // TODO: implement data fetching
+        $customers = $this->service->getAll();
         $this->view('customers.index', ['customers' => $customers]);
     }
 
