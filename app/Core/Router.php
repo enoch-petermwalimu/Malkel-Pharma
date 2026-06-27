@@ -34,6 +34,12 @@ class Router
         $path =
             $request->path();
 
+        // Normalize path: remove trailing slash except for root
+        $path = rtrim($path, '/');
+        if ($path === '') {
+            $path = '/';
+        }
+
         $handler =
             $this->routes[$method][$path]
             ?? null;
