@@ -232,6 +232,11 @@ $router->post('/suppliers/delete', [
     'delete'
 ]);
 
+$router->post('/suppliers/send-pdf', [
+    SupplierController::class,
+    'sendPdfToClient'
+]);
+
 /**
  * Purchases
  */
