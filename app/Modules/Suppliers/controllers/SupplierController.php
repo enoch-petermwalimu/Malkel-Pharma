@@ -6,6 +6,7 @@ use App\Core\Controller;
 use App\Core\Request;
 
 use App\Modules\Suppliers\Services\SupplierService;
+use App\Modules\WhatsApp\Services\WhatsAppService;
 
 /**
  * Supplier Controller
@@ -101,5 +102,31 @@ public function delete(): void
     $this->json([
         'success' => $success
     ]);
+}
+
+/**
+ * Send PDF to client via WhatsApp
+ */
+public function sendPdfToClient(): void
+{
+    $request = new Request();
+    $data = $request->body();
+
+    $phone = $data['phone'] ?? '';
+    $pdfUrl = $data['pdf_url'] ?? '';
+    $caption = $data['caption'] ?? '';
+
+    if (empty($phone) || empty($pdfUrl)) {
+        $this->json([
+            'success' => false,
+            'message' => 'Phone and pdf_url are required'
+        ]);
+        return;
+    }
+
+    $whatsApp = new WhatsAppService();
+    $result = $whatsApp->sendPdf($phone, $pdfUrl, $caption);
+
+    $this->json($result);
 }
 }
