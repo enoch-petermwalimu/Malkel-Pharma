@@ -10,8 +10,8 @@ class WhatsAppService
 
     public function __construct()
     {
-        $this->apiToken = $_ENV['WHATSAPP_API_TOKEN'] ?? '';
-        $this->phoneNumberId = $_ENV['WHATSAPP_PHONE_NUMBER_ID'] ?? '';
+        $this->apiToken = env('WHATSAPP_API_TOKEN', '');
+        $this->phoneNumberId = env('WHATSAPP_PHONE_NUMBER_ID', '');
     }
 
     /**
