@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <title>Receipt</title>
 <style>
-body{font-family:Arial,sans-serif;width:58mm;margin:auto;padding:2px;color:#111827;font-size:9px;line-height:1.2}
+/* ---------- thermal receipt optimizations ---------- */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;color:#111827;font-size:9px;line-height:1.2;background:#fff}
+.receipt{width:58mm;margin:0 auto;padding:2px;overflow:hidden}
 .center{text-align:center}
 .line{border-top:1px dashed #94a3b8;margin:4px 0}
 .receipt-title{font-size:12px;font-weight:700}
@@ -19,10 +22,16 @@ td{padding:1px 0}
 .total-final{font-size:11px;font-weight:700}
 .footer{text-align:center;font-size:8px;color:#475569}
 button{width:100%;padding:4px;border:none;border-radius:4px;background:#2563eb;color:white;cursor:pointer;margin-bottom:4px;font-size:9px}
-@media print{@page{margin:0;size:auto}body{margin:0;padding:0;width:auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}button{display:none}}
+@media print{
+@page{size:58mm auto;margin:0}
+body{margin:0;padding:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.receipt{width:58mm;margin:0;padding:0;overflow:hidden;page-break-inside:avoid;page-break-after:avoid}
+button{display:none!important}
+}
 </style>
 </head>
 <body>
+<div class="receipt">
 <button onclick="window.print()">Print</button>
 <div class="center">
 <div class="receipt-title">MALKEL PHARMA</div>
@@ -55,5 +64,31 @@ button{width:100%;padding:4px;border:none;border-radius:4px;background:#2563eb;c
 <div><span class="section-title">Payment</span><br>Method: <?= htmlspecialchars($sale['payment_method'] ?? 'Cash') ?><br>Currency: <?= htmlspecialchars($sale['currency_mode'] ?? 'USD') ?><br>USD Rec: <?= number_format($sale['amount_received_usd']??0,2) ?> USD<br>CDF Rec: <?= number_format($sale['amount_received_cdf']??0,0) ?> FC<br>Change USD: <?= number_format($sale['change_usd']??0,2) ?> USD<br>Change CDF: <?= number_format($sale['change_cdf']??0,0) ?> FC</div>
 <div class="line"></div>
 <div class="footer">Thank you for your trust.<br>Your Health, Our Priority.<br><strong>MALKEL PHARMA</strong></div>
+</div>
+<script>
+(function(){
+    // auto‑print on load
+    window.print();
+    // after printing (or cancel) redirect to POS
+    var redirectTimer = setTimeout(function(){
+        window.location.href = '/pos';
+    }, 2000);
+    // if the user actually printed, the browser may fire onafterprint
+    if (window.matchMedia) {
+        var mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener(function(mql){
+            if (!mql.matches) {
+                clearTimeout(redirectTimer);
+                window.location.href = '/pos';
+            }
+        });
+    }
+    // fallback for browsers that don't support matchMedia listener
+    window.onafterprint = function(){
+        clearTimeout(redirectTimer);
+        window.location.href = '/pos';
+    };
+})();
+</script>
 </body>
 </html>
