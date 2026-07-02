@@ -162,14 +162,21 @@ button{
 
 @media print{
 
-    button{
-
-        display:none;
+    @page {
+        margin: 0;
+        size: auto;
     }
 
     body{
-
+        margin: 0;
+        padding: 0;
         width:auto;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    button{
+        display:none;
     }
 }
 
