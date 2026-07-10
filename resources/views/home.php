@@ -37,7 +37,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 0;
+            z-index: 2;
             overflow: hidden;
         }
         /* pill shape */
@@ -125,13 +125,13 @@
     <script>
         (function() {
             const container = document.getElementById('rain-container');
-            const count = 30;
+            const count = 40;
             for (let i = 0; i < count; i++) {
                 const pill = document.createElement('span');
                 pill.className = 'pill';
-                const size = Math.random() * 20 + 10; // 10‑30px
+                const size = Math.random() * 40 + 20; // 20‑60px
                 pill.style.width = size + 'px';
-                pill.style.height = (size * 0.4) + 'px';
+                pill.style.height = (size * 0.5) + 'px';
                 pill.style.left = Math.random() * 100 + '%';
                 pill.style.animationDuration = (Math.random() * 3 + 2) + 's'; // 2‑5s
                 pill.style.animationDelay = Math.random() * 5 + 's';
