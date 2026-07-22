@@ -6,21 +6,21 @@
 <style>
 /* ---------- thermal receipt optimizations ---------- */
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;color:#111827;font-size:9px;line-height:1.2;background:#fff}
+body{font-family:Arial,sans-serif;color:#000000;font-size:9px;line-height:1.2;background:#fff}
 .receipt{width:58mm;margin:0 auto;padding:2px;overflow:hidden}
 .center{text-align:center}
-.line{border-top:1px dashed #94a3b8;margin:4px 0}
+.line{border-top:1px dashed #000000;margin:4px 0}
 .receipt-title{font-size:12px;font-weight:700}
-.receipt-subtitle{font-size:8px;color:#64748b}
+.receipt-subtitle{font-size:8px;color:#000000}
 .receipt-meta{text-align:center;font-size:9px}
 .section-title{font-weight:700;margin-bottom:2px}
 table{width:100%;border-collapse:collapse;font-size:9px}
 td{padding:1px 0}
 .product-name{font-weight:600}
-.total-box{padding:4px;border:1px solid #cbd5e1;border-radius:4px;background:#f8fafc}
+.total-box{padding:4px;border:1px solid #000000;border-radius:4px;background:#f8fafc}
 .total-line{display:flex;justify-content:space-between;margin-bottom:2px}
 .total-final{font-size:11px;font-weight:700}
-.footer{text-align:center;font-size:8px;color:#475569}
+.footer{text-align:center;font-size:8px;color:#000000}
 button{width:100%;padding:4px;border:none;border-radius:4px;background:#2563eb;color:white;cursor:pointer;margin-bottom:4px;font-size:9px}
 @media print{
 @page{size:58mm auto;margin:0}
@@ -35,7 +35,7 @@ button{display:none!important}
 <button onclick="window.print()">Print</button>
 <div class="center">
 <div class="receipt-title">MALKEL PHARMA</div>
-<div class="receipt-subtitle">Healthcare &amp; Pharmaceutical Center<br>Avenue Lumumba<br>Lubumbashi - DR Congo<br>+243 999 999 999<br>contact@malkelpharma.cd</div>
+<div class="receipt-subtitle">Healthcare &amp; Pharmaceutical Center<br> No 11 Avenue MUNUA<br>Lubumbashi - DR Congo<br>+243 842 205 811<br>contact@malkelpharma.com</div>
 </div>
 <div class="line"></div>
 <div class="receipt-meta"><strong>SALES RECEIPT</strong><br><?= htmlspecialchars($sale['invoice_number']) ?><br><?= htmlspecialchars($sale['created_at']) ?></div>
