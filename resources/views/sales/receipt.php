@@ -34,8 +34,7 @@ button{display:none!important}
 <div class="receipt">
 <button onclick="window.print()">Print</button>
 <div class="center">
-<!-- Place your logo file at public/assets/images/logo.png -->
-<img src="/assets/images/logo.png" alt="MALKEL PHARMA" class="logo" style="display:block;margin:0 auto;max-width:50mm;height:auto;margin-bottom:4px">
+<span style="display:block;font-size:24px;text-align:center;margin-bottom:4px">☤</span>
 <div class="receipt-title">MALKEL PHARMA</div>
 <div class="receipt-subtitle">Healthcare &amp; Pharmaceutical Center<br> No 11 Avenue MUNUA<br>Lubumbashi - DR Congo<br>+243 842 205 811<br>contact@malkelpharma.com</div>
 </div>
