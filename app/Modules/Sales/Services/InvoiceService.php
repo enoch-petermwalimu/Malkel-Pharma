@@ -102,7 +102,7 @@ class InvoiceService
 
         <p style="font-size:11px;color:#555555;line-height:18px;">
 
-        Avenue Lumumba
+        No 11 Avenue MUNUA
 
         <br>
 
@@ -114,11 +114,11 @@ class InvoiceService
 
         <br>
 
-        +243 999 999 999
+        +243 842 205 811
 
         <br>
 
-        contact@malkelpharma.cd
+        contact@malkelpharma.com
 
         </p>
 

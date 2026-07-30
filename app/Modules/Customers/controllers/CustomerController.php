@@ -8,88 +8,31 @@ class CustomerController extends Controller
 {
     public function index(): void
     {
-        $db =
-        \App\Core\Database::connect();
+        // Placeholder – route will resolve without error
+        $this->json(['message' => 'Customer module under construction']);
+    }
 
-        $statement =
-        $db->query(
-            "
-            SELECT *
-            FROM customers
-            ORDER BY id DESC
-            "
-        );
+    public function create(): void
+    {
+        // Placeholder
+        $this->json(['message' => 'Customer create view under construction']);
+    }
 
-        $customers =
-        $statement->fetchAll();
-
-        $this->view(
-            'customers.index',
-            compact('customers')
-        );
+    public function store(): void
+    {
+        // Placeholder
+        $this->json(['message' => 'Customer store action under construction']);
     }
 
     public function show(): void
     {
-        $id = (int) ($_GET['id'] ?? 0);
+        // Placeholder
+        $this->json(['message' => 'Customer show view under construction']);
+    }
 
-        $db = \App\Core\Database::connect();
-
-        $stmt = $db->prepare(
-            "
-            SELECT *
-            FROM customers
-            WHERE id = ?
-            LIMIT 1
-            "
-        );
-
-        $stmt->execute([$id]);
-
-        $customer =
-            $stmt->fetch();
-
-        if (!$customer) {
-
-            die('Customer not found');
-        }
-
-        $salesStmt = $db->prepare(
-            "
-            SELECT *
-            FROM sales
-            WHERE customer_id = ?
-            ORDER BY created_at DESC
-            "
-        );
-
-        $salesStmt->execute([$id]);
-
-        $sales =
-            $salesStmt->fetchAll();
-
-        $statsStmt = $db->prepare(
-            "
-            SELECT
-                COUNT(*) total_sales,
-                SUM(total) total_spent
-            FROM sales
-            WHERE customer_id = ?
-            "
-        );
-
-        $statsStmt->execute([$id]);
-
-        $stats =
-            $statsStmt->fetch();
-
-        $this->view(
-            'customers.show',
-            compact(
-                'customer',
-                'sales',
-                'stats'
-            )
-        );
+    public function search(): void
+    {
+        // Placeholder
+        $this->json(['message' => 'Customer search under construction']);
     }
 }

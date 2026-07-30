@@ -107,6 +107,9 @@ content="width=device-width, initial-scale=1.0">
 <?= htmlspecialchars($pageTitle) ?>
 </title>
 
+<!--  AJOUT : Liaison avec le fichier manifest.json pour Microsoft Edge -->
+<link rel="manifest" href="/manifest.json">
+
 <link
 rel="preconnect"
 href="https://fonts.googleapis.com">
@@ -247,9 +250,11 @@ class="<?= str_starts_with($currentRoute,'/settings') ? 'active' : '' ?>"
 </a>
 
 <a 
-href="/system">
+href="/system"
+class="<?= str_starts_with($currentRoute,'/system') ? 'active' : '' ?>"
+>
 <i class="fas fa-server"></i>
-    Système
+<span class="nav-text">Système</span>
 </a>
 
 <a href="/logout">
@@ -322,6 +327,17 @@ Business Intelligence Center
 
 <script
 src="/assets/js/app.js">
+</script>
+
+<!--  AJOUT : Script d'enregistrement du Service Worker pour la gestion Hors-ligne -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('MALKEL ERP : Service Worker actif !'))
+                .catch(err => console.log('MALKEL ERP : Erreur de Service Worker :', err));
+        });
+    }
 </script>
 
 </body>

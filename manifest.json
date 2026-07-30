@@ -1,5 +1,25 @@
 {
-    "name": "MALKEL PHARMA",
+  "name": "MALKEL PHARMA",
+  "short_name": "Malkel Pharma",
+  "description": "Application de gestion - Version 1.0.0 (Build 20260622)",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0078d4",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "metadata": {
     "version": "1.0.0",
     "codename": "LUBUMBASHI",
     "build": "20260622",
@@ -7,4 +27,5 @@
     "author": "MALKEL PHARMA",
     "minimum_php": "8.1",
     "minimum_mariadb": "10.5"
+  }
 }
